@@ -1,0 +1,25 @@
+{
+
+  project : {
+    name : 'Platformer',
+    version : '1.0.0',
+    author : 'nicom',
+
+    app : {
+      name : 'nicom_platformer',
+      package : 'com.nicom.platformer'
+    },
+
+    build : { 
+      dependencies : {
+        luxe : '*',
+      }
+    },
+
+    files : {
+      assets : 'assets/'
+    }
+
+  }
+
+}
