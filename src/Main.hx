@@ -34,21 +34,8 @@ class Main extends luxe.Game {
     } //ready
 
     function _setUpCamera() {
-    	/*var scaleX = Luxe.screen.w / _defaultX;
-    	var scaleY = Luxe.screen.h / _defaultY;
-
-    	Luxe.camera.size = new Vector(Luxe.screen.w / scaleX, Luxe.screen.h / scaleY);
-    	Luxe.camera.size_mode = SizeMode.fit;
-
-    	Luxe.draw.line({
-    		p0:	new Vector(0,0),
-    		p1:	new Vector(0, Luxe.screen.h)
-    	});
-    	Luxe.draw.line({
-    		p0:	new Vector(Luxe.camera.size.x,0),
-    		p1:	new Vector(Luxe.camera.size.x, Luxe.screen.h)
-    	});function*/
-		Luxe.camera.zoom = 2.0;
+		var zoom = (Luxe.screen.w / _defaultX) * 2;
+		Luxe.camera.zoom = zoom;
     }
 
     function _load() {
