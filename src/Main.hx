@@ -3,11 +3,16 @@ import luxe.Input;
 import luxe.AppConfig;
 import luxe.Camera;
 import phoenix.Vector;
+import level.LevelEditor;
+import level.LevelRect;
 
+//47.26 STRIPPED
 class Main extends luxe.Game {
 
 	var _defaultX: Int = 960;
 	var _defaultY: Int = 640;
+
+	var _editor: LevelEditor;
 
 	override function config(c: AppConfig): AppConfig {
 		//c.window.width = 1440;
@@ -19,6 +24,8 @@ class Main extends luxe.Game {
     	_setUpCamera();
     	Luxe.renderer.vsync = true;
     	new Player();
+
+    	_editor = new LevelEditor();
     } //ready
 
     function _setUpCamera() {
@@ -47,7 +54,7 @@ class Main extends luxe.Game {
     } //onkeyup
 
     override function update(dt:Float) {
-
+    	_editor.update();
     } //update
 
 

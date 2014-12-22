@@ -25,7 +25,7 @@ class Player extends Sprite {
 	var _drawer: ShapeDrawerLuxe; //COLLISION
 
 	///Velocity Multiplier
-	public var m: Float = 130.0;
+	public var m: Float = 100.0;
 
 	///X-axis velocity
 	public var vX: Float = 0.0;
