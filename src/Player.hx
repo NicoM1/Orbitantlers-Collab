@@ -260,7 +260,7 @@ class Player extends Sprite {
 			});
 		}
 
-		if((cLeft || cRight) && vY > 0) {
+		if(!onGround && (cLeft || cRight) && vY > 0) {
 			if(cLeft) flipx = true;
 			else flipx = false;
 			if(_anim.animation != 'wallslide') {
