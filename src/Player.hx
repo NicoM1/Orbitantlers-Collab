@@ -22,6 +22,9 @@ class Player extends Sprite {
 	static inline var GAMEPAD_A: Int = 0;
 	static inline var GAMEPAD_DEADZONE: Float = 0.3;
 
+	var colWidth: Int = 13;
+	var colHeight: Int = 40;
+
 	///Internal collider representation
 	var _collisionShape: Polygon;
 	var _otherShapes: Array<Shape>;
@@ -86,6 +89,10 @@ class Player extends Sprite {
 	var _gamepadRight: Bool = false;
 
 	var _anim: SpriteAnimation;
+
+	var _leftEdge: Float;
+	var _rightEdge: Float;
+	var _floorEdge: Float;
 	
 	public function new() {
 		var texture = Luxe.loadTexture('assets/art/character/run_strip.png');
@@ -99,9 +106,9 @@ class Player extends Sprite {
 
 		_createAnim();
 
-		pos.y = Luxe.camera.size.y - size.y / 2;
+		pos.x = Luxe.screen.w / 2 - colWidth / 2;
 
-		_collisionShape = Polygon.rectangle(pos.x, pos.y, 13, 40);
+		_collisionShape = Polygon.rectangle(pos.x, pos.y, colWidth, colHeight);
 
 		_setUpShapes();
 
@@ -110,6 +117,10 @@ class Player extends Sprite {
 		for(o in _otherShapes) {
 			_drawer.drawShape(o);
 		}
+
+		_leftEdge = Std.int(Luxe.camera.screen_point_to_world(new Vector()).x);
+		_rightEdge = Std.int(Luxe.camera.screen_point_to_world(new Vector(Luxe.screen.w)).x);
+		_floorEdge = Std.int(Luxe.camera.screen_point_to_world(new Vector(0, Luxe.screen.h)).y);
 	}
 
 	function _createAnim() {
@@ -125,10 +136,11 @@ class Player extends Sprite {
 
 	function _setUpShapes() {
 		_otherShapes = [];
-		_otherShapes.push(Polygon.square(200, pos.y, size.x));
-		_otherShapes.push(Polygon.square(200 + size.x, pos.y - size.y, size.x));
-		_otherShapes.push(Polygon.rectangle(200 + size.x * 2, pos.y - size.y * 4, size.x, size.y * 5));
-		_otherShapes.push(Polygon.rectangle(200 + size.x * 10, pos.y - size.y * 4, size.x * 5, size.y));
+		//_otherShapes.push(Polygon.rectangle(0, 450, 10000, 10));
+		//_otherShapes.push(Polygon.square(200, pos.y, size.x));
+		//_otherShapes.push(Polygon.square(200 + size.x, pos.y - size.y, size.x));
+		//_otherShapes.push(Polygon.rectangle(200 + size.x * 2, pos.y - size.y * 4, size.x, size.y * 5));
+		//_otherShapes.push(Polygon.rectangle(200 + size.x * 10, pos.y - size.y * 4, size.x * 5, size.y));
 	}
 
 	override function update(dt: Float) {
@@ -249,6 +261,8 @@ class Player extends Sprite {
 		}
 
 		if((cLeft || cRight) && vY > 0) {
+			if(cLeft) flipx = true;
+			else flipx = false;
 			_anim.animation = 'wallslide';
 			//if sliding down a wall, apply friction
 			vY = _approachValue(vY, _vMax.y, _gravSlide);
@@ -393,18 +407,18 @@ class Player extends Sprite {
 
 	///Collide against screen edges
 	function _collideScreen() {	
-		if(pos.y + size.y / 2 > Luxe.camera.size.y) {
+		if(pos.y + colHeight / 2 > _floorEdge) {
 			vY = 0;
-			pos.y = Luxe.camera.size.y - size.y / 2;
+			pos.y = _floorEdge - colHeight / 2;
 		}
 
-		if(pos.x + size.x / 2 > Luxe.camera.size.x) {
+		if(pos.x + colWidth / 2 > _rightEdge) {
 			vX = 0;
-			pos.x = Luxe.camera.size.x - size.x / 2;
+			pos.x = _rightEdge - colWidth / 2;
 		}
-		else if(pos.x - size.x / 2 < 0) {
+		else if(pos.x - colWidth / 2 < _leftEdge) {
 			vX = 0;
-			pos.x = size.x / 2;
+			pos.x = _leftEdge + colWidth / 2;
 		}
 	}
 
@@ -416,7 +430,7 @@ class Player extends Sprite {
 
 	///Check if touching at base
 	function _onGround(): Bool {
-		if(pos.y + size.y / 2 >= Luxe.camera.size.y) {
+		if(pos.y + size.y / 2 >= _floorEdge) {
 			return true;
 		}
 
@@ -425,8 +439,8 @@ class Player extends Sprite {
 
 	///Check collision after an offset
 	function _checkCollision(offsetX: Int, offsetY: Int): Bool {
-		if(pos.x + offsetX - size.x / 2 < 0) {return true;}
-		if(pos.x + offsetX + size.x / 2 > Luxe.camera.size.x) {return true;}
+		if(pos.x + offsetX - colWidth / 2 < _leftEdge) {return true;}
+		if(pos.x + offsetX + colWidth / 2 > _rightEdge) {return true;}
 
 		_collisionShape.x = pos.x + offsetX;
 		_collisionShape.y = pos.y + offsetY;

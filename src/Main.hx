@@ -25,7 +25,7 @@ class Main extends luxe.Game {
 
     override function ready() {
     	_setUpCamera();
-    	Luxe.renderer.clear_color = new Color(0.6,0.6,0.6);
+    	Luxe.renderer.clear_color = new Color(94 / 255, 92 / 255, 79 / 255);
     	Luxe.renderer.vsync = true;
 
     	_load();
@@ -34,7 +34,7 @@ class Main extends luxe.Game {
     } //ready
 
     function _setUpCamera() {
-    	var scaleX = Luxe.screen.w / _defaultX;
+    	/*var scaleX = Luxe.screen.w / _defaultX;
     	var scaleY = Luxe.screen.h / _defaultY;
 
     	Luxe.camera.size = new Vector(Luxe.screen.w / scaleX, Luxe.screen.h / scaleY);
@@ -47,7 +47,8 @@ class Main extends luxe.Game {
     	Luxe.draw.line({
     		p0:	new Vector(Luxe.camera.size.x,0),
     		p1:	new Vector(Luxe.camera.size.x, Luxe.screen.h)
-    	});
+    	});function*/
+		Luxe.camera.zoom = 2.0;
     }
 
     function _load() {
