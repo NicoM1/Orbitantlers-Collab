@@ -277,7 +277,7 @@ class Player extends Sprite {
 		if(!_sticking) {
 			var doFric: Bool = true;
 
-			if(iLeft) {
+			if(iLeft && !iRight) {
 				//if pressing left and moving right, 
 				//apply friction before applying velocity
 				if(vX > 0) {
@@ -288,7 +288,7 @@ class Player extends Sprite {
 				flipx = true;
 			}
 
-			if(iRight) {
+			if(iRight && !iLeft) {
 				//if pressing right and moving left,  
 				//apply friction before applying velocity
 				if(vX < 0) {
