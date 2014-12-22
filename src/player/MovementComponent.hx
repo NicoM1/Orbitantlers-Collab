@@ -1,4 +1,6 @@
-package ;
+package player;
+
+import luxe.Component;
 
 import luxe.Sprite;
 
@@ -17,7 +19,9 @@ import luxe.components.sprite.SpriteAnimation;
 
 import luxe.Input;
 
-class Player extends Sprite {
+class MovementComponent extends Component {
+
+	var _sprite: Sprite;
 
 	static inline var GAMEPAD_A: Int = 0;
 	static inline var GAMEPAD_DEADZONE: Float = 0.3;
@@ -27,7 +31,7 @@ class Player extends Sprite {
 
 	///Internal collider representation
 	var _collisionShape: Polygon;
-	var _otherShapes: Array<Shape>;
+	var _otherShapes: Array<Shape> = [];
 	var _drawer: ShapeDrawerLuxe; //COLLISION
 
 	///Velocity Multiplier
@@ -95,52 +99,21 @@ class Player extends Sprite {
 	var _floorEdge: Float;
 	
 	public function new() {
-		var texture = Luxe.loadTexture('assets/art/character/run_strip.png');
-		texture.filter = FilterType.nearest;
+		super({name: 'movement'});
+	}
 
-		super({
-			name: 'player',
-			texture: texture,
-			size: new Vector(37, 40)
-		});
-
-		_createAnim();
-
-		pos.x = Luxe.screen.w / 2 - colWidth / 2;
+	override function init() {
+		_sprite = cast entity;
 
 		_collisionShape = Polygon.rectangle(pos.x, pos.y, colWidth, colHeight);
-
-		_setUpShapes();
-
-		_drawer = new ShapeDrawerLuxe();
-
-		for(o in _otherShapes) {
-			_drawer.drawShape(o);
-		}
 
 		_leftEdge = Std.int(Luxe.camera.screen_point_to_world(new Vector()).x);
 		_rightEdge = Std.int(Luxe.camera.screen_point_to_world(new Vector(Luxe.screen.w)).x);
 		_floorEdge = Std.int(Luxe.camera.screen_point_to_world(new Vector(0, Luxe.screen.h)).y);
-	}
 
-	function _createAnim() {
-		var animJSON = Luxe.loadJSON('assets/files/character_anim.json');
+		pos.x = Luxe.screen.w / 2 - colWidth / 2;
 
-		_anim = add(new SpriteAnimation({name: 'anim'}));
-
-		_anim.add_from_json_object(animJSON.json);
-
-		_anim.animation = 'idle';
-		_anim.play();
-	}
-
-	function _setUpShapes() {
-		_otherShapes = [];
-		//_otherShapes.push(Polygon.rectangle(0, 450, 10000, 10));
-		//_otherShapes.push(Polygon.square(200, pos.y, size.x));
-		//_otherShapes.push(Polygon.square(200 + size.x, pos.y - size.y, size.x));
-		//_otherShapes.push(Polygon.rectangle(200 + size.x * 2, pos.y - size.y * 4, size.x, size.y * 5));
-		//_otherShapes.push(Polygon.rectangle(200 + size.x * 10, pos.y - size.y * 4, size.x * 5, size.y));
+		_anim = get('anim');
 	}
 
 	override function update(dt: Float) {
@@ -261,8 +234,8 @@ class Player extends Sprite {
 		}
 
 		if(!onGround && (cLeft || cRight) && vY > 0) {
-			if(cLeft) flipx = true;
-			else flipx = false;
+			if(cLeft) _sprite.flipx = true;
+			else _sprite.flipx = false;
 			if(_anim.animation != 'wallslide') {
 				_anim.animation = 'wallslide';
 			}
@@ -285,7 +258,7 @@ class Player extends Sprite {
 				}
 				vX = _approachValue(vX, -_vMax.x, tempAccel);
 				doFric = false;
-				flipx = true;
+				_sprite.flipx = true;
 			}
 
 			if(iRight && !iLeft) {
@@ -296,7 +269,7 @@ class Player extends Sprite {
 				}
 				vX = _approachValue(vX, _vMax.x, tempAccel);
 				doFric = false;
-				flipx = false;
+				_sprite.flipx = false;
 			}
 
 			//if no input pressed, apply friction to slow down
@@ -437,7 +410,7 @@ class Player extends Sprite {
 
 	///Check if touching at base
 	function _onGround(): Bool {
-		if(pos.y + size.y / 2 >= _floorEdge) {
+		if(pos.y + _sprite.size.y / 2 >= _floorEdge) {
 			return true;
 		}
 
@@ -465,9 +438,4 @@ class Player extends Sprite {
 		}
 	} 
 
-	///Unsafe trace, traces or doesnt randomly, saves from overflows
-	function _uTrace(v: Dynamic) {
-
-		if(Math.random() < 0.1) trace(v);
-	}
 }

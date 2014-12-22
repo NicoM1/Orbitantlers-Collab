@@ -57,7 +57,7 @@ class Main extends luxe.Game {
 
     function _assetsLoaded(_) {
     	trace('loaded');
-    	new Player();
+    	new player.Player();
     }
 
     override function onkeyup( e:KeyEvent ) {
