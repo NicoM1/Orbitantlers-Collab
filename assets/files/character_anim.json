@@ -1,0 +1,32 @@
+{
+	"run": {
+		"frame_size": {"x": "37", "y": "40"},
+		"frameset": ["1-4"],
+		"loop": "true",
+		"speed": "11"
+	},
+	"idle": {
+		"frame_size": {"x": "37", "y": "40"},
+		"frameset": ["5"],
+		"loop": "true",
+		"speed": "11"
+	},
+	"jump": {
+		"frame_size": {"x": "37", "y": "40"},
+		"frameset": ["6"],
+		"loop": "true",
+		"speed": "11"
+	},
+	"fall": {
+		"frame_size": {"x": "37", "y": "40"},
+		"frameset": ["7"],
+		"loop": "true",
+		"speed": "11"
+	},
+	"wallslide": {
+		"frame_size": {"x": "37", "y": "40"},
+		"frameset": ["8"],
+		"loop": "true",
+		"speed": "11"
+	}
+}

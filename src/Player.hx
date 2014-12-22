@@ -3,6 +3,7 @@ package ;
 import luxe.Sprite;
 
 import phoenix.Vector;
+import phoenix.Texture;
 
 import snow.input.Keycodes;
 
@@ -11,6 +12,8 @@ import luxe.collision.CollisionData;
 import luxe.collision.shapes.Shape;
 import luxe.collision.shapes.Polygon;
 import luxe.collision.ShapeDrawerLuxe;
+
+import luxe.components.sprite.SpriteAnimation;
 
 import luxe.Input;
 
@@ -25,7 +28,7 @@ class Player extends Sprite {
 	var _drawer: ShapeDrawerLuxe; //COLLISION
 
 	///Velocity Multiplier
-	public var m: Float = 100.0;
+	public var m: Float = 75.0;
 
 	///X-axis velocity
 	public var vX: Float = 0.0;
@@ -81,16 +84,24 @@ class Player extends Sprite {
 	var _gamepadJump: Bool = false;
 	var _gamepadLeft: Bool = false;
 	var _gamepadRight: Bool = false;
+
+	var _anim: SpriteAnimation;
 	
 	public function new() {
+		var texture = Luxe.loadTexture('assets/art/character/run_strip.png');
+		texture.filter = FilterType.nearest;
+
 		super({
 			name: 'player',
-			size: new Vector(13,36) 
+			texture: texture,
+			size: new Vector(37, 40)
 		});
 
+		_createAnim();
+
 		pos.y = Luxe.camera.size.y - size.y / 2;
-		trace(pos.x + " " + pos.y);
-		_collisionShape = Polygon.rectangle(pos.x, pos.y, size.x, size.y);
+
+		_collisionShape = Polygon.rectangle(pos.x, pos.y, 13, 40);
 
 		_setUpShapes();
 
@@ -99,6 +110,17 @@ class Player extends Sprite {
 		for(o in _otherShapes) {
 			_drawer.drawShape(o);
 		}
+	}
+
+	function _createAnim() {
+		var animJSON = Luxe.loadJSON('assets/files/character_anim.json');
+
+		_anim = add(new SpriteAnimation({name: 'anim'}));
+
+		_anim.add_from_json_object(animJSON.json);
+
+		_anim.animation = 'idle';
+		_anim.play();
 	}
 
 	function _setUpShapes() {
@@ -227,6 +249,7 @@ class Player extends Sprite {
 		}
 
 		if((cLeft || cRight) && vY > 0) {
+			_anim.animation = 'wallslide';
 			//if sliding down a wall, apply friction
 			vY = _approachValue(vY, _vMax.y, _gravSlide);
 		}
@@ -246,33 +269,51 @@ class Player extends Sprite {
 				}
 				vX = _approachValue(vX, -_vMax.x, tempAccel);
 				doFric = false;
+				flipx = true;
 			}
 
 			if(iRight) {
-				//if pressing right and moving left, 
+				//if pressing right and moving left,  
 				//apply friction before applying velocity
 				if(vX < 0) {
 					vX = _approachValue(vX, 0, tempFric);
 				}
 				vX = _approachValue(vX, _vMax.x, tempAccel);
 				doFric = false;
+				flipx = false;
 			}
 
 			//if no input pressed, apply friction to slow down
 			if(doFric) {
 				vX = _approachValue(vX, 0, tempFric);
+				if(onGround) {
+					_anim.animation = 'idle';
+				}
+			}
+			else {
+				//we must be moving so play run
+				if(onGround && _anim.animation != 'run') {
+					_anim.animation = 'run';
+				}
 			}
 		}
 
 		//wall jumping
 		if(!onGround && iJump) {
+			var didJump = false;
 			if(cLeft) {
+				didJump = true;
 				vY = -_jumpHeight * 1.25;
 				vX = _vMax.x / 1.5;
 			}
 			else if(cRight) {
+				didJump = true;
 				vY = -_jumpHeight * 1.25;
 				vX = -_vMax.x / 1.5;
+			}
+
+			if(didJump) {
+				_anim.animation = 'jump';
 			}
 		}
 
@@ -281,7 +322,12 @@ class Player extends Sprite {
 			if(_jumpMarginTimer > 0) {
 				vY = -_jumpHeight;
 				_jumpMarginTimer = 0;
+				_anim.animation = 'jump';
 			}
+		}
+
+		if(!onGround && !cLeft && ! cRight && vY > 0) {
+			_anim.animation = 'fall';
 		}
 
 		//count down jump margin timer

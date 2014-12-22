@@ -3,8 +3,11 @@ import luxe.Input;
 import luxe.AppConfig;
 import luxe.Camera;
 import phoenix.Vector;
+import phoenix.Color;
 import level.LevelEditor;
 import level.LevelRect;
+import luxe.Parcel;
+import luxe.ParcelProgress;
 
 //47.26 STRIPPED
 class Main extends luxe.Game {
@@ -22,8 +25,10 @@ class Main extends luxe.Game {
 
     override function ready() {
     	_setUpCamera();
+    	Luxe.renderer.clear_color = new Color(0.6,0.6,0.6);
     	Luxe.renderer.vsync = true;
-    	new Player();
+
+    	_load();
 
     	_editor = new LevelEditor();
     } //ready
@@ -43,6 +48,26 @@ class Main extends luxe.Game {
     		p0:	new Vector(Luxe.camera.size.x,0),
     		p1:	new Vector(Luxe.camera.size.x, Luxe.screen.h)
     	});
+    }
+
+    function _load() {
+    	var json = Luxe.loadJSON('assets/files/parcel.json');
+
+    	var parcel = new Parcel();
+    	parcel.from_json(json.json);
+
+    	new ParcelProgress({
+    		parcel: parcel,
+    		background: new Color(0.3,0.3,0.3),
+    		oncomplete: _assetsLoaded
+    	});
+
+    	parcel.load();
+    }
+
+    function _assetsLoaded(_) {
+    	trace('loaded');
+    	new Player();
     }
 
     override function onkeyup( e:KeyEvent ) {
