@@ -7,25 +7,31 @@
 	},
 	"idle": {
 		"frame_size": {"x": "37", "y": "40"},
-		"frameset": ["5"],
+		"frameset": ["5-7"],
 		"loop": "true",
-		"speed": "11"
+		"speed": "6"
 	},
 	"jump": {
 		"frame_size": {"x": "37", "y": "40"},
-		"frameset": ["6"],
+		"frameset": ["8"],
 		"loop": "true",
 		"speed": "11"
 	},
 	"fall": {
 		"frame_size": {"x": "37", "y": "40"},
-		"frameset": ["7"],
+		"frameset": ["9"],
 		"loop": "true",
 		"speed": "11"
 	},
 	"wallslide": {
 		"frame_size": {"x": "37", "y": "40"},
-		"frameset": ["8"],
+		"frameset": ["10", "hold 4", "11", "hold 2"],
+		"loop": "true",
+		"speed": "6"
+	},
+	"slide": {
+		"frame_size": {"x": "37", "y": "40"},
+		"frameset": ["9"],
 		"loop": "true",
 		"speed": "11"
 	}

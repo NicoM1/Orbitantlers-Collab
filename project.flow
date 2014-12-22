@@ -1,7 +1,7 @@
 {
 
   project : {
-    name : 'Platformer',
+    name : 'Platformer-Orbitantlers',
     version : '1.0.0',
     author : 'nicom',
 

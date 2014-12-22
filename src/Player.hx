@@ -52,7 +52,7 @@ class Player extends Sprite {
 	var _airAccel: Float = 15.0;
 	
 	///Friction on ground
-	var _groudFric: Float = 80;
+	var _groudFric: Float = 20;//80;
 	///Friction in air
 	var _airFric: Float = 30;//6 //ACCELERATION + FRICTION
 
@@ -263,7 +263,9 @@ class Player extends Sprite {
 		if((cLeft || cRight) && vY > 0) {
 			if(cLeft) flipx = true;
 			else flipx = false;
-			_anim.animation = 'wallslide';
+			if(_anim.animation != 'wallslide') {
+				_anim.animation = 'wallslide';
+			}
 			//if sliding down a wall, apply friction
 			vY = _approachValue(vY, _vMax.y, _gravSlide);
 		}
@@ -301,7 +303,12 @@ class Player extends Sprite {
 			if(doFric) {
 				vX = _approachValue(vX, 0, tempFric);
 				if(onGround) {
-					_anim.animation = 'idle';
+					if(vX != 0) {
+						_anim.animation = 'slide';
+					}
+					else if (_anim.animation != 'idle') {
+						_anim.animation = 'idle';
+					}
 				}
 			}
 			else {
