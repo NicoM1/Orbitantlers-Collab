@@ -57,14 +57,14 @@ class Player extends Sprite {
 	var _airFric: Float = 30;//6 //ACCELERATION + FRICTION
 
 	///Jump force
-	var _jumpHeight: Float = 11.0;
+	var _jumpHeight: Float = 6;//11.0;
 	///Time margin to make jump after leaving ground
 	var _jumpMargin: Float = 0.1; //0.05
 	///Timer for jump margin
 	var _jumpMarginTimer: Float = 0;
 
 	///Gravity without friction
-	var _gravNorm: Float = 45;
+	var _gravNorm: Float = 25;//45;
 	///Gravity against an object
 	var _gravSlide: Float = 4; //JUMP + GRAVITY
 
