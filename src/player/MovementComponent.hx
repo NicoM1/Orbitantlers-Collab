@@ -1,9 +1,5 @@
 package player;
 
-import luxe.Component;
-
-import luxe.Sprite;
-
 import phoenix.Vector;
 import phoenix.Texture;
 
@@ -16,19 +12,28 @@ import luxe.collision.shapes.Polygon;
 import luxe.collision.ShapeDrawerLuxe;
 
 import luxe.components.sprite.SpriteAnimation;
-
+import luxe.Component;
+import luxe.Sprite;
 import luxe.Input;
+import luxe.States;
+
+import input.XBoxButtonMap;
 
 class MovementComponent extends Component {
 
+	//owner of this component
 	var _sprite: Sprite;
 
-	static inline var GAMEPAD_A: Int = 0;
-	static inline var GAMEPAD_DEADZONE: Float = 0.3;
+	//SOMEDAY I WILL USE THIS
+	var _machine: States;
 
+	//animation component on the sprite
+	var _anim: SpriteAnimation;
+
+	//width of collider
 	var colWidth: Int = 13;
+	//height of collider
 	var colHeight: Int = 40;
-
 	///Internal collider representation
 	var _collisionShape: Polygon;
 	var _otherShapes: Array<Shape> = [];
@@ -79,23 +84,34 @@ class MovementComponent extends Component {
 	///Currently sticking to wall
 	var _sticking: Bool = false; //WALL-CLING
 
-
+	//percentage of screen before which pressing counts as left input
+	//after counts as right input
 	var _touchMoveRatio: Float = 0.3;
+	//percentage of screen after which tapping counts as jump input
 	var _touchJumpStart: Float = 0.7;
 
+	//ID of the touch used for left/right movement
 	var _touchMoveID: Null<Int> = null;
+
+	//is currently using touch to move left
 	var _touchMoveLeft: Bool = false;
+	//is currently using touch to move left
 	var _touchMoveRight: Bool = false;
+	//has tapped jump portion in last frame
 	var _touchJump: Bool = false;
 
+	//has pressed [jump] button on controller
 	var _gamepadJump: Bool = false;
+	//is holding movement axis to the left
 	var _gamepadLeft: Bool = false;
+	//is holding movement axis to the right
 	var _gamepadRight: Bool = false;
 
-	var _anim: SpriteAnimation;
-
+	//left edge of viewport
 	var _leftEdge: Float;
+	//right edge of viewport
 	var _rightEdge: Float;
+	//bottom edge of viewport
 	var _floorEdge: Float;
 	
 	public function new() {
@@ -104,16 +120,20 @@ class MovementComponent extends Component {
 
 	override function init() {
 		_sprite = cast entity;
+		_machine = new States({name:'machine'});
+		_anim = get('anim');
 
 		_collisionShape = Polygon.rectangle(pos.x, pos.y, colWidth, colHeight);
 
+		_findScreenEdges();
+
+		pos.x = Luxe.screen.w / 2 - colWidth / 2;
+	}
+
+	function _findScreenEdges() {
 		_leftEdge = Std.int(Luxe.camera.screen_point_to_world(new Vector()).x);
 		_rightEdge = Std.int(Luxe.camera.screen_point_to_world(new Vector(Luxe.screen.w)).x);
 		_floorEdge = Std.int(Luxe.camera.screen_point_to_world(new Vector(0, Luxe.screen.h)).y);
-
-		pos.x = Luxe.screen.w / 2 - colWidth / 2;
-
-		_anim = get('anim');
 	}
 
 	override function update(dt: Float) {
@@ -127,19 +147,26 @@ class MovementComponent extends Component {
 	}
 
 	override function ontouchdown(e: TouchEvent) {
+		//if we dont already have a movement touch id
 		if(_touchMoveID == null) {
+			//and its on the move not jump portion
 			if(e.x <= _touchJumpStart) {
+				//set the ID so we only use this touch
 				_touchMoveID = e.touch_id;
 
+				//check where we should move
 				_checkTouchMove(e);
 			}
 		}
+		//if this is a new touch, regardless of if we have an ID,
+		//check if it is on the jump portion
 		if(e.x > _touchJumpStart) {
 			_touchJump = true;
 		}
 	}
 
 	function _checkTouchMove(e: TouchEvent) {
+		//if touch is less than ratio, touch is considered left movement
 		if(e.x <= _touchMoveRatio / 2) {
 			_touchMoveLeft = true;
 			_touchMoveRight = false;
@@ -151,12 +178,14 @@ class MovementComponent extends Component {
 	}
 
 	override function ontouchmove(e: TouchEvent) {
+		//if the touch we are tracking moves, check if the move direction has changed
 		if(e.touch_id == _touchMoveID) {
 			_checkTouchMove(e);
 		}
 	}
 
 	override function ontouchup(e: TouchEvent) {
+		//if our tracked touch leaves, default all our touch related members
 		if(e.touch_id == _touchMoveID) {
 			_touchMoveLeft = false;
 			_touchMoveRight = false;
@@ -165,18 +194,20 @@ class MovementComponent extends Component {
 	}
 
 	override function ongamepaddown(e: GamepadEvent) {
-		if(e.button == GAMEPAD_A) {
+		//if we pressed [jump] on the controller
+		if(e.button == XBoxButtonMap.GAMEPAD_A) {
 			_gamepadJump = true;
 		}
 	}
 
 	override function ongamepadaxis(e: GamepadEvent) {
+		//check gamepad axis for movement, taking into account deadzones
 		if(e.axis == 0) {
-			if(e.value > GAMEPAD_DEADZONE) {
+			if(e.value > XBoxButtonMap.GAMEPAD_DEADZONE) {
 				_gamepadLeft = false;
 				_gamepadRight = true;
 			}
-			else if(e.value < -GAMEPAD_DEADZONE) {
+			else if(e.value < -XBoxButtonMap.GAMEPAD_DEADZONE) {
 				_gamepadLeft = true;
 				_gamepadRight = false;
 			}
@@ -233,6 +264,7 @@ class MovementComponent extends Component {
 			});
 		}
 
+		//WALL-SLIDE//////////////////////////////////////////////////////////////////
 		if(!onGround && (cLeft || cRight) && vY > 0) {
 			if(cLeft) _sprite.flipx = true;
 			else _sprite.flipx = false;
@@ -276,16 +308,18 @@ class MovementComponent extends Component {
 			if(doFric) {
 				vX = _approachValue(vX, 0, tempFric);
 				if(onGround) {
+					//FLOOR-SLIDE////////////////////////////////////////////////////////
 					if(vX != 0) {
 						_anim.animation = 'slide';
 					}
+					//IDLE//////////////////////////////////////////////////////////////
 					else if (_anim.animation != 'idle') {
 						_anim.animation = 'idle';
 					}
 				}
 			}
-			else {
-				//we must be moving so play run
+			else {	//we must be moving so play run
+				//RUN//////////////////////////////////////////////////////////////
 				if(onGround && _anim.animation != 'run') {
 					_anim.animation = 'run';
 				}
@@ -307,6 +341,7 @@ class MovementComponent extends Component {
 			}
 
 			if(didJump) {
+				//WALL-JUMP/////////////////////////////////////////////////////////////
 				_anim.animation = 'jump';
 			}
 		}
@@ -316,11 +351,13 @@ class MovementComponent extends Component {
 			if(_jumpMarginTimer > 0) {
 				vY = -_jumpHeight;
 				_jumpMarginTimer = 0;
+				//JUMP////////////////////////////////////////////////////////////////
 				_anim.animation = 'jump';
 			}
 		}
 
 		if(!onGround && !cLeft && ! cRight && vY > 0) {
+			//FALL/////////////////////////////////////////////////////////////
 			_anim.animation = 'fall';
 		}
 
