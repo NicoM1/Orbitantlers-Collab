@@ -19,6 +19,8 @@ import luxe.States;
 
 import input.XBoxButtonMap;
 
+import level.*;
+
 class MovementComponent extends Component {
 
 	//owner of this component
@@ -36,7 +38,6 @@ class MovementComponent extends Component {
 	var colHeight: Int = 40;
 	///Internal collider representation
 	var _collisionShape: Polygon;
-	var _otherShapes: Array<Shape> = [];
 	var _drawer: ShapeDrawerLuxe; //COLLISION
 
 	///Velocity Multiplier
@@ -53,7 +54,7 @@ class MovementComponent extends Component {
 	var _cY: Float = 0.0;
 	
 	///Maximum veloctity
-	var _vMax: Vector = new Vector(6.5, 10.0); //VELOCITY
+	var _vMax: Vector = new Vector(8.0, 15.0); //VELOCITY 6.5
 
 	///Acceleration on ground
 	var _groundAccel: Float = 45.0;
@@ -268,15 +269,17 @@ class MovementComponent extends Component {
 		if(!onGround && (cLeft || cRight) && vY > 0) {
 			if(cLeft) _sprite.flipx = true;
 			else _sprite.flipx = false;
-			if(_anim.animation != 'wallslide') {
-				_anim.animation = 'wallslide';
-			}
 			//if sliding down a wall, apply friction
 			vY = _approachValue(vY, _vMax.y, _gravSlide);
 		}
 		else {
 			//otherwise, fall normally
 			vY = _approachValue(vY, _vMax.y, _gravNorm);
+		}
+		if(!onGround && (cLeft || cRight)) {
+			if(_anim.animation != 'wallslide') {
+				_anim.animation = 'wallslide';
+			}
 		}
 
 		if(!_sticking) {
@@ -390,7 +393,7 @@ class MovementComponent extends Component {
 			_collisionShape.y += _sign(vYNew);
 
 			//test new position against scene
-			var c = Collision.testShapes(_collisionShape, _otherShapes);
+			var c = Collision.testShapes(_collisionShape, cast Level.colliders);
 			if(c.length > 0) {
 				vY = 0;
 				break;
@@ -410,7 +413,7 @@ class MovementComponent extends Component {
 			_collisionShape.x += _sign(vXNew);
 
 			//test new position against scene
-			var c = Collision.testShapes(_collisionShape, _otherShapes);
+			var c = Collision.testShapes(_collisionShape, cast Level.colliders);
 			if(c.length > 0) {
 				vX = 0;
 				break;
@@ -462,7 +465,7 @@ class MovementComponent extends Component {
 		_collisionShape.x = pos.x + offsetX;
 		_collisionShape.y = pos.y + offsetY;
 
-		return Collision.testShapes(_collisionShape, _otherShapes).length > 0;
+		return Collision.testShapes(_collisionShape, cast Level.colliders).length > 0;
 	}
 
 	///Approach a value by a shift amount, affected by dt

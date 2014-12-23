@@ -4,8 +4,7 @@ import luxe.AppConfig;
 import luxe.Camera;
 import phoenix.Vector;
 import phoenix.Color;
-import level.LevelEditor;
-import level.LevelRect;
+import level.Level;
 import luxe.Parcel;
 import luxe.ParcelProgress;
 
@@ -15,7 +14,7 @@ class Main extends luxe.Game {
 	var _defaultX: Int = 960;
 	var _defaultY: Int = 640;
 
-	var _editor: LevelEditor;
+	var _level: Level;
 
 	override function config(c: AppConfig): AppConfig {
 		//c.window.width = 1440;
@@ -30,14 +29,14 @@ class Main extends luxe.Game {
 
     	_load();
 
-    	_editor = new LevelEditor();
+    	_level= new Level();
     } //ready
 
     function _setUpCamera() {
     	Luxe.camera.size = new Vector(Luxe.screen.w, Luxe.screen.h);
 		var zoom = (Luxe.screen.h / _defaultY) * 2;
 		trace(zoom);
-		Luxe.camera.zoom = zoom;
+		Luxe.camera.zoom = 1;//zoom;
     }
 
     function _load() {
@@ -58,6 +57,7 @@ class Main extends luxe.Game {
     function _assetsLoaded(_) {
     	trace('loaded');
     	new player.Player();
+    	new level.Level();
     }
 
     override function onkeyup( e:KeyEvent ) {
@@ -69,7 +69,7 @@ class Main extends luxe.Game {
     } //onkeyup
 
     override function update(dt:Float) {
-    	_editor.update();
+    	_level.update();
     } //update
 
 

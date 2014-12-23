@@ -1,5 +1,6 @@
 {
 	"textures": [
-		{"id": "assets/art/character/run_strip.png"}
+		{"id": "assets/art/character/run_strip.png"},
+		{"id": "assets/art/floor.png"}
 	]
 }

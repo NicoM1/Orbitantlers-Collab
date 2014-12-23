@@ -1,0 +1,10 @@
+{
+	"visuals": [
+		{"x": 0, "y": 0, "w": 256, "h": 256, "art": "assets/art/floor.png"}
+	],
+	"colliders": [
+		{"id": "group1", "colliders": [
+			{"x": 0, "y": 0, "w": 256, "h": 256}
+		]}
+	]
+}
