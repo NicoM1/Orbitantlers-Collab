@@ -7,6 +7,8 @@ import phoenix.Texture;
 import luxe.collision.shapes.Polygon;
 import luxe.collision.shapes.Shape;
 
+import snow.input.Keycodes;
+
 class Level {
 
 	static public var colliders(default, null): Array<Collider>;
@@ -16,18 +18,6 @@ class Level {
 	var _editMode: Bool = true;
 
 	public function new() {
-		var texture = Luxe.loadTexture('assets/art/floor.png');
-		texture.filter = FilterType.nearest;
-
-		/*super({
-			name: 'level',
-			texture: texture,
-			depth: -3,
-			size: new Vector(256, 256)
-		});*/
-
-		//pos = new Vector(size.x / 2, Luxe.screen.h - size.y / 2);
-
 		colliders = new Array<Collider>();
 		visuals = new Array<Sprite>();
 		groups = new Map<String, Array<Collider>>();
@@ -39,12 +29,12 @@ class Level {
 		_addColider(192,Luxe.screen.h - 32,64,32);
 
 		parseJSON('assets/files/testmap.json');
-
-		trace(groups);
 	}
-
 	public function update() {
 		if(_editMode) {
+			if(Luxe.input.mousepressed(3)) {
+				_addColider(Luxe.mouse.x, Luxe.mouse.y, 32, 32);
+			}
 			for (c in colliders) c.update();
 		}
 	}

@@ -28,8 +28,6 @@ class Main extends luxe.Game {
     	Luxe.renderer.vsync = true;
 
     	_load();
-
-    	_level= new Level();
     } //ready
 
     function _setUpCamera() {
@@ -57,7 +55,7 @@ class Main extends luxe.Game {
     function _assetsLoaded(_) {
     	trace('loaded');
     	new player.Player();
-    	new level.Level();
+    	_level = new Level();
     }
 
     override function onkeyup( e:KeyEvent ) {
@@ -69,7 +67,8 @@ class Main extends luxe.Game {
     } //onkeyup
 
     override function update(dt:Float) {
-    	_level.update();
+    	if(_level != null)
+    		_level.update();
     } //update
 
 
