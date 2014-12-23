@@ -1,10 +1,8 @@
 {
 	"visuals": [
-		{"x": 0, "y": 0, "w": 256, "h": 256, "art": "assets/art/floor.png"}
+		{"x": 0, "y": 0, "w": 960, "h": 640, "art": "assets/art/mockup.png"}
 	],
 	"colliders": [
-		{"id": "group1", "colliders": [
-			{"x": 0, "y": 0, "w": 256, "h": 256}
-		]}
+	
 	]
 }

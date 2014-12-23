@@ -19,8 +19,8 @@ class Collider extends Polygon {
 	var _moving: Bool = false;
 	var _resizing: Bool = false;
 
-	var _w: Float;
-	var _h: Float;
+	public var w(default, null): Float;
+	public var h(default, null): Float;
 
 	var _test: ShapeDrawerLuxe;
 
@@ -32,8 +32,8 @@ class Collider extends Polygon {
 
 		_lastMouse = new Vector();
 
-		_w = w_;
-		_h = h_;
+		w = w_;
+		h = h_;
 
 		_geom = new RectangleGeometry({
 			x: x_,
@@ -60,20 +60,20 @@ class Collider extends Polygon {
 
 	public function changeSize(w_: Float, h_: Float, offset_: Bool = true) {
 		if(offset_) {
-			w_ += _w;
-			h_ += _h;
+			w_ += w;
+			h_ += h;
 		}
 		if(w_ < 15 || h_ < 15) return;
-		_w = w_;
-		_h = h_;
+		w = w_;
+		h = h_;
 
 		//HACK SO NEW SHAPE REGISTERS
 		refresh_transform();
 
-		vertices[1].x = _w;
-		vertices[2].x = _w;
-		vertices[2].y = _h;
-		vertices[3].y = _h;
+		vertices[1].x = w;
+		vertices[2].x = w;
+		vertices[2].y = h;
+		vertices[3].y = h;
 
 		_resetVisual();
 	}
@@ -91,7 +91,7 @@ class Collider extends Polygon {
 		 		var delta = _lastMouse.subtract(Luxe.mouse);
 		 		var mousePos = Vector.Subtract(Luxe.mouse, position);
 
-		 		if(!_resizing && (mousePos.x < _w - 10 || mousePos.y < _h - 10)) {
+		 		if(!_resizing && (mousePos.x < w - 10 || mousePos.y < h - 10)) {
 		 			_moving = true;
 		 			changePos(-delta.x, -delta.y);
 		 		}
@@ -113,22 +113,22 @@ class Collider extends Polygon {
 		//_test.drawPolygon(this);
 		_geom.transform.pos.x = x;
 		_geom.transform.pos.y = y;
-		_geom.vertices[1].pos.x = _w;
-		_geom.vertices[2].pos.x = _w;
-		_geom.vertices[3].pos.y = _h;
-		_geom.vertices[4].pos.y = _h;
-		_geom.vertices[3].pos.x = _w;
-		_geom.vertices[4].pos.x = _w;
-		_geom.vertices[5].pos.y = _h;
-		_geom.vertices[6].pos.y = _h;
+		_geom.vertices[1].pos.x = w;
+		_geom.vertices[2].pos.x = w;
+		_geom.vertices[3].pos.y = h;
+		_geom.vertices[4].pos.y = h;
+		_geom.vertices[3].pos.x = w;
+		_geom.vertices[4].pos.x = w;
+		_geom.vertices[5].pos.y = h;
+		_geom.vertices[6].pos.y = h;
 	}
 
 	function _mouseInside(): Bool {
 		var is = Collision.pointInPoly(Luxe.mouse, this);
 			//Luxe.mouse.x > x &&
-			//Luxe.mouse.x < x + _w &&
+			//Luxe.mouse.x < x + w &&
 			//Luxe.mouse.y > y &&
-			//Luxe.mouse.y < y + _h;
+			//Luxe.mouse.y < y + h;
 		return is;
 	}
 

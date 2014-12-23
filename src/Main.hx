@@ -60,6 +60,9 @@ class Main extends luxe.Game {
 
     override function onkeyup( e:KeyEvent ) {
 
+    	if(e.keycode == Key.key_s) {
+    		_level.saveJSON('assets/files/output.lvl');
+    	}
         if(e.keycode == Key.escape) {
             Luxe.shutdown();
         }
@@ -70,6 +73,10 @@ class Main extends luxe.Game {
     	if(_level != null)
     		_level.update();
     } //update
+
+    override function ondestroy() {
+
+    }
 
 
 } //Main
