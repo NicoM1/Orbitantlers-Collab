@@ -423,6 +423,17 @@ class MovementComponent extends Component {
 				pos.x += _sign(vXNew);
 			}
 		}
+
+		_collisionShape.x = pos.x;
+		_collisionShape.y = pos.y;
+		var finalCols = Collision.testShapes(_collisionShape, cast Level.colliders);
+		if(finalCols.length > 0) {
+			for(fc in finalCols) {
+				_collisionShape.position.add(fc.separation);
+			}
+		}
+		pos.x = _collisionShape.x;
+		pos.y = _collisionShape.y;
 	}
 
 	///Collide against screen edges
