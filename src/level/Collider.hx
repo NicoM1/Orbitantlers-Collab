@@ -55,6 +55,8 @@ class Collider extends Polygon {
 
 	public function deselect() {
 		selected = false;
+		_moving = false;
+		_resizing = false;
 	}
 
 	public function toggleSelected() {
@@ -92,6 +94,10 @@ class Collider extends Polygon {
 	}
 
 	public function update() {
+		if(Luxe.input.mousereleased(1)) {
+			_moving = false;
+			_resizing = false;
+		}
 		_makeChanges();
 	}
 
@@ -105,11 +111,11 @@ class Collider extends Polygon {
 		 		var delta = _lastMouse.subtract(Luxe.camera.screen_point_to_world(Luxe.mouse));
 		 		var mousePos = Vector.Subtract(Luxe.camera.screen_point_to_world(Luxe.mouse), position);
 
-		 		if(!_resizing && ((mousePos.x < w - 10 || mousePos.y < h - 10) || selected)) {
+		 		if(!_resizing && ((mousePos.x < w - 10 || mousePos.y < h - 10) || Level._selectedCount > 1)) {//|| selected
 		 			_moving = true;
 		 			changePos(-delta.x, -delta.y);
 		 		}
-		 		else if (!_moving && !selected) {
+		 		else if (!_moving && Level._selectedCount == 1) { // && !selected
 		 			_resizing = true;
 		 			changeSize(-delta.x, -delta.y);
 		 		}

@@ -23,7 +23,7 @@ class Level {
 
 	var _editMode: Bool = true;
 
-	var _selectedCount: Int = 0;
+	public static var _selectedCount: Int = 0;
 
 	public function new() {
 		colliders = new Array<Collider>();

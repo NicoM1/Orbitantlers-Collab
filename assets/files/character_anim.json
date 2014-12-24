@@ -3,7 +3,7 @@
 		"frame_size": {"x": "37", "y": "40"},
 		"frameset": ["1-7"],
 		"loop": "true",
-		"speed": "11"
+		"speed": "16"
 	},
 	"idle": {
 		"frame_size": {"x": "37", "y": "40"},
