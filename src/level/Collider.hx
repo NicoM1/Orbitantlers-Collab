@@ -132,7 +132,7 @@ class Collider extends Polygon {
 		return is;
 	}
 
-	function toggleDebug() {
+	public function toggleDebug() {
 		_geom.visible = !_geom.visible;
 	}
 }

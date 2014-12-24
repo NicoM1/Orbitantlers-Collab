@@ -9,6 +9,8 @@ import luxe.components.sprite.SpriteAnimation;
 
 class Player extends Sprite {
 
+	var _camSpeedMult: Float = 2.0;
+
 	public function new() {
 		var texture = Luxe.loadTexture('assets/art/character/run_strip.png');
 		texture.filter = FilterType.nearest;
@@ -22,6 +24,13 @@ class Player extends Sprite {
 		_createAnim();
 
 		add(new MovementComponent());
+	}
+
+	override function update(dt: Float) {
+		var dist: Vector = Vector.Subtract(pos, Luxe.camera.pos);
+
+		Luxe.camera.pos.x += (dist.x - Luxe.screen.w / 2) * dt * _camSpeedMult;
+		Luxe.camera.pos.y += (dist.y - Luxe.screen.h / 2) * dt * _camSpeedMult;
 	}
 
 	function _createAnim() {

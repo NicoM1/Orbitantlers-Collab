@@ -59,7 +59,9 @@ class Main extends luxe.Game {
     }
 
     override function onkeyup( e:KeyEvent ) {
-
+    	if(e.keycode == Key.tab) {
+    		_level.toggleEdit();
+    	}
     	if(e.keycode == Key.key_s) {
     		_level.saveJSON('assets/files/output.lvl');
     	}

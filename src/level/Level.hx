@@ -87,8 +87,10 @@ class Level {
 	}
 
 	function _addVisual(x: Float, y: Float, w: Float, h: Float, art: String) {
+		var texture = Luxe.loadTexture(art);
+		texture.filter = FilterType.nearest;
 		var visual = new Sprite ({
-			texture: Luxe.loadTexture(art),
+			texture: texture,
 			pos: new Vector(x + w/2, y + h/2),
 			size: new Vector(w, h),
 			depth: -1
@@ -96,8 +98,11 @@ class Level {
 		visuals.push(visual);
 	}
 
-	function toggleEdit() {
+	public function toggleEdit() {
 		_editMode = !_editMode;
+		for(c in colliders) {
+			c.toggleDebug();
+		}
 	}
 }
 

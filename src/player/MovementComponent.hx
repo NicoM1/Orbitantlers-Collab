@@ -62,7 +62,7 @@ class MovementComponent extends Component {
 	var _airAccel: Float = 15.0;
 	
 	///Friction on ground
-	var _groudFric: Float = 20;//80;
+	var _groudFric: Float = 60;//80;
 	///Friction in air
 	var _airFric: Float = 30;//6 //ACCELERATION + FRICTION
 
