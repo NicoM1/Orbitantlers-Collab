@@ -1,37 +1,37 @@
 {
 	"run": {
 		"frame_size": {"x": "37", "y": "40"},
-		"frameset": ["1-4"],
+		"frameset": ["1-7"],
 		"loop": "true",
 		"speed": "11"
 	},
 	"idle": {
 		"frame_size": {"x": "37", "y": "40"},
-		"frameset": ["5-7"],
+		"frameset": ["8-10"],
 		"loop": "true",
 		"speed": "6"
 	},
 	"jump": {
 		"frame_size": {"x": "37", "y": "40"},
-		"frameset": ["8"],
+		"frameset": ["11"],
 		"loop": "true",
 		"speed": "11"
 	},
 	"fall": {
 		"frame_size": {"x": "37", "y": "40"},
-		"frameset": ["9"],
+		"frameset": ["12"],
 		"loop": "true",
 		"speed": "11"
 	},
 	"wallslide": {
 		"frame_size": {"x": "37", "y": "40"},
-		"frameset": ["10", "hold 4", "11", "hold 2"],
+		"frameset": ["13", "hold 4", "14", "hold 2"],
 		"loop": "true",
 		"speed": "6"
 	},
 	"slide": {
 		"frame_size": {"x": "37", "y": "40"},
-		"frameset": ["9"],
+		"frameset": ["12"],
 		"loop": "true",
 		"speed": "11"
 	}
