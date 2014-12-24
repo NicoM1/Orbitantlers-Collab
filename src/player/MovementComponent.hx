@@ -362,7 +362,7 @@ class MovementComponent extends Component {
 
 		if (!onGround && iJumpReleased) {
 			if(vY < 0) {
-				vY *= 0.5;
+				vY *= 0.35;
 			}
 		}
 
