@@ -88,8 +88,8 @@ class Collider extends Polygon {
 
 		 		_geom.color.g = 0;
 
-		 		var delta = _lastMouse.subtract(Luxe.mouse);
-		 		var mousePos = Vector.Subtract(Luxe.mouse, position);
+		 		var delta = _lastMouse.subtract(Luxe.camera.screen_point_to_world(Luxe.mouse));
+		 		var mousePos = Vector.Subtract(Luxe.camera.screen_point_to_world(Luxe.mouse), position);
 
 		 		if(!_resizing && (mousePos.x < w - 10 || mousePos.y < h - 10)) {
 		 			_moving = true;
@@ -106,7 +106,7 @@ class Collider extends Polygon {
 			_moving = false;
 			_resizing = false;
 		}
-		_lastMouse.copy_from(Luxe.mouse);
+		_lastMouse.copy_from(Luxe.camera.screen_point_to_world(Luxe.mouse));
 	}
 
 	function _resetVisual() {
@@ -124,7 +124,7 @@ class Collider extends Polygon {
 	}
 
 	function _mouseInside(): Bool {
-		var is = Collision.pointInPoly(Luxe.mouse, this);
+		var is = Collision.pointInPoly(Luxe.camera.screen_point_to_world(Luxe.mouse), this);
 			//Luxe.mouse.x > x &&
 			//Luxe.mouse.x < x + w &&
 			//Luxe.mouse.y > y &&
