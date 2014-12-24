@@ -8,6 +8,7 @@ import luxe.collision.shapes.Polygon;
 import luxe.collision.shapes.Shape;
 
 import snow.input.Keycodes;
+import luxe.Input;
 
 import haxe.Json;
 
@@ -22,6 +23,8 @@ class Level {
 
 	var _editMode: Bool = true;
 
+	var _selectedCount: Int = 0;
+
 	public function new() {
 		colliders = new Array<Collider>();
 		visuals = new Array<Sprite>();
@@ -31,8 +34,42 @@ class Level {
 
 	public function update() {
 		if(_editMode) {
+			var safe: Bool = false;
 			if(Luxe.input.mousepressed(3)) {
 				_addColider(Luxe.mouse.x, Luxe.mouse.y, 32, 32);
+			}
+			if(Luxe.input.keydown(Key.key_q) || _selectedCount == 0) {
+				if(Luxe.input.mousepressed(1)) {
+					for (c in colliders) {
+						if (c.mouseInside()) {
+							c.toggleSelected();
+							safe = true;
+							if(c.selected) {
+								_selectedCount++;
+							}
+							else {
+								_selectedCount--;
+							}
+						}
+					}
+				}
+			}
+			if(Luxe.input.mousepressed(1) && !safe) {
+				var deselect: Bool = true;
+				for(c in colliders) {
+					if(c.selected && c.mouseInside()) {
+						deselect = false;
+					}
+				}
+
+				if(deselect) {
+					for (c in colliders) {
+						if(c.selected) {
+							_selectedCount--;
+						}
+						c.deselect();
+					}
+				}
 			}
 			for (c in colliders) c.update();
 		}

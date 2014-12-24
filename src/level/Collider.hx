@@ -18,6 +18,7 @@ class Collider extends Polygon {
 	var _lastMouse: Vector;
 	var _moving: Bool = false;
 	var _resizing: Bool = false;
+	public var selected(default, null): Bool = false;
 
 	public var w(default, null): Float;
 	public var h(default, null): Float;
@@ -46,6 +47,18 @@ class Collider extends Polygon {
 		//Luxe.renderer.batcher.add(_geom);
 		_geom.depth = 10;
 		//toggleDebug();
+	}
+
+	public function select() {
+		selected = true;
+	}
+
+	public function deselect() {
+		selected = false;
+	}
+
+	public function toggleSelected() {
+		selected = !selected;
 	}
 
 	public function changePos(x_: Float, y_: Float, offset_: Bool = true) {
@@ -83,19 +96,20 @@ class Collider extends Polygon {
 	}
 
 	function _makeChanges() {
-		if(Luxe.input.mousedown(1)) {
-			if(_mouseInside() || _moving || _resizing) {
+		if(selected) _moving = false;
+		if(_moving || _resizing || selected) {
+			_geom.color.g = 0;
 
-		 		_geom.color.g = 0;
+			if(Luxe.input.mousedown(1)) {
 
 		 		var delta = _lastMouse.subtract(Luxe.camera.screen_point_to_world(Luxe.mouse));
 		 		var mousePos = Vector.Subtract(Luxe.camera.screen_point_to_world(Luxe.mouse), position);
 
-		 		if(!_resizing && (mousePos.x < w - 10 || mousePos.y < h - 10)) {
+		 		if(!_resizing && ((mousePos.x < w - 10 || mousePos.y < h - 10) || selected)) {
 		 			_moving = true;
 		 			changePos(-delta.x, -delta.y);
 		 		}
-		 		else if (!_moving) {
+		 		else if (!_moving && !selected) {
 		 			_resizing = true;
 		 			changeSize(-delta.x, -delta.y);
 		 		}
@@ -123,7 +137,7 @@ class Collider extends Polygon {
 		_geom.vertices[6].pos.y = h;
 	}
 
-	function _mouseInside(): Bool {
+	public function mouseInside(): Bool {
 		var is = Collision.pointInPoly(Luxe.camera.screen_point_to_world(Luxe.mouse), this);
 			//Luxe.mouse.x > x &&
 			//Luxe.mouse.x < x + w &&
