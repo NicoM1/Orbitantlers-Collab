@@ -87,7 +87,7 @@ class Collider extends Polygon {
 
 		vertices[1].x = w;
 		vertices[2].x = w;
-		vertices[2].y = h;
+		vertices[2].y = h; 
 		vertices[3].y = h;
 
 		_resetVisual();

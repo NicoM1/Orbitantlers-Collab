@@ -36,7 +36,8 @@ class Level {
 		if(_editMode) {
 			var safe: Bool = false;
 			if(Luxe.input.mousepressed(3)) {
-				_addColider(Luxe.mouse.x, Luxe.mouse.y, 32, 32);
+				var pos = Luxe.camera.screen_point_to_world(Luxe.mouse);
+				_addColider(pos.x, pos.y, 32, 32);
 			}
 			if(Luxe.input.keydown(Key.key_q) || _selectedCount == 0) {
 				if(Luxe.input.mousepressed(1)) {
