@@ -59,7 +59,7 @@ class Main extends luxe.Game {
     }
 
     override function onkeyup( e:KeyEvent ) {
-    	if(e.keycode == Key.tab) {
+    	if(e.keycode == Key.key_e) {
     		_level.toggleEdit();
     	}
     	if(e.keycode == Key.key_s) {

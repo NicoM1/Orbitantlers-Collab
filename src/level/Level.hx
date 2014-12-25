@@ -19,21 +19,45 @@ import sys.io.File;
 class Level {
 
 	static public var colliders(default, null): Array<Collider>;
-	var visuals: Array<Sprite>;
+	var visuals: Array<Visual>;
 
 	var _editMode: Bool = true;
+	var _visualMode: Bool = false;
 
 	public static var _selectedCount: Int = 0;
 
+	var _brush: Sprite;
+
+	var _artChunks: Array<VisualStruct> = [
+		{art: "assets/art/stamp.png", w: 214, h: 252},
+		{art: "assets/art/mockup.png", w: 960, h: 640}
+	];
+
+	var _selectedArt: Int = 0;
+
 	public function new() {
 		colliders = new Array<Collider>();
-		visuals = new Array<Sprite>();
+		visuals = new Array<Visual>();
+
+		_brush = new Sprite({
+			texture: Luxe.loadTexture(_artChunks[_selectedArt].art),
+			size: new Vector(_artChunks[_selectedArt].w, _artChunks[_selectedArt].h)
+		});
+
+		_brush.color.a = 0.5;
+		_brush.visible = false;
 
 		parseJSON('assets/files/output.lvl');
 	}
 
 	public function update() {
 		if(_editMode) {
+			if(Luxe.input.keypressed(Key.key_v)) {
+				toggleEdit();
+				_enableVisualMode();
+				return;
+			}
+
 			var safe: Bool = false;
 			if(Luxe.input.mousepressed(3)) {
 				var pos = Luxe.camera.screen_point_to_world(Luxe.mouse);
@@ -74,6 +98,57 @@ class Level {
 			}
 			for (c in colliders) c.update();
 		}
+		if(_visualMode) {
+			if(Luxe.input.keypressed(Key.key_v)) {
+				toggleEdit();
+				_disableVisualMode();
+			}
+
+			if(Luxe.input.keypressed(Key.up)) {
+				if(_selectedArt < _artChunks.length - 1) {
+					_selectedArt++;
+					_resetStamp();
+				}
+				else {
+					_selectedArt = 0;
+					_resetStamp();
+				}
+			}
+			else if(Luxe.input.keypressed(Key.down)) {
+				if(_selectedArt > 0) {
+					_selectedArt--;
+					_resetStamp();
+				}
+				else {
+					_selectedArt = _artChunks.length - 1;
+					_resetStamp();
+				}
+			}
+
+			var brushPos = Luxe.camera.screen_point_to_world(Luxe.mouse);
+			_brush.pos.x = brushPos.x;
+			_brush.pos.y = brushPos.y;
+
+			brushPos.subtract(new Vector(_artChunks[_selectedArt].w / 2, _artChunks[_selectedArt].h / 2));
+
+			if(Luxe.input.mousepressed(3)) {
+				_addVisual(
+					Math.floor(brushPos.x), 
+					Math.floor(brushPos.y), 
+					_artChunks[_selectedArt].w, 
+					_artChunks[_selectedArt].h,
+					_artChunks[_selectedArt].art
+				).enableDebug();
+			}
+
+			for(v in visuals) v.updateDebug();
+		}
+	}
+
+	function _resetStamp() {
+		_brush.texture = Luxe.loadTexture(_artChunks[_selectedArt].art);
+		_brush.size.x = _artChunks[_selectedArt].w;
+		_brush.size.y = _artChunks[_selectedArt].h;
 	}
 
 	public function parseJSON(path: String) {
@@ -116,6 +191,18 @@ class Level {
 			json.colliders.push(cJSON);
 		}
 
+		for(v in visuals) {
+			var vJSON: VisualStruct = {
+				x: v.pos.x - v.size.x / 2, 
+				y: v.pos.y - v.size.y / 2, 
+				w: v.size.x,
+				h: v.size.y,
+				depth: v.depth,
+				art: v.art
+			};
+			json.visuals.push(vJSON);
+		}
+
 		return json;
 	}
 
@@ -124,23 +211,30 @@ class Level {
 		colliders.push(collider);
 	}
 
-	function _addVisual(x: Float, y: Float, w: Float, h: Float, art: String) {
-		var texture = Luxe.loadTexture(art);
-		texture.filter = FilterType.nearest;
-		var visual = new Sprite ({
-			texture: texture,
-			pos: new Vector(x + w/2, y + h/2),
-			size: new Vector(w, h),
-			depth: -1
-		});
+	function _addVisual(x: Float, y: Float, w: Float, h: Float, art: String): Visual {
+		var visual = new Visual(x,y,w,h,art);
 		visuals.push(visual);
+		return visual;
 	}
 
 	public function toggleEdit() {
 		_editMode = !_editMode;
+		if(_editMode) _disableVisualMode();
 		for(c in colliders) {
 			c.toggleDebug();
 		}
+	}
+
+	function _disableVisualMode() {
+		for(v in visuals) v.disableDebug();
+		_brush.visible = false;
+		_visualMode = false;
+	}
+
+	function _enableVisualMode() {
+		for(v in visuals) v.enableDebug();
+		_brush.visible = true;
+		_visualMode = true;
 	}
 }
 
@@ -150,11 +244,12 @@ typedef MapStruct = {
 }
 
 typedef VisualStruct = {
-	x: Float,
-	y: Float,
+	?x: Float,
+	?y: Float,
 	w: Float,
 	h: Float,
-	art: String
+	art: String,
+	?depth: Float
 }
 
 typedef ColliderStruct = {
