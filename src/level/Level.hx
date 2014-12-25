@@ -57,6 +57,10 @@ class Level {
 				return;
 			}
 
+			if(Luxe.input.keypressed(Key.key_l)) {
+				_loadJSONWeb();
+			}
+
 			var safe: Bool = false;
 			if(Luxe.input.mousepressed(3)) {
 				var pos = Luxe.camera.screen_point_to_world(Luxe.mouse);
@@ -179,20 +183,51 @@ class Level {
 		}
 	}
 
+	function _loadJSONWeb() {
+		#if web
+			_reset();
+			var jsonS: String = untyped __js__('window.prompt(\"Insert Level-Code\", \"paste level-code here.\")');
+			var json = Json.parse(jsonS);
+			trace('json', json);
+			var map: MapStruct = cast json;
+
+			for(v in map.visuals) {
+				_addVisual(v.x, v.y, v.w, v.h, v.art);
+			}
+			for(c in map.colliders) {
+				_addColider(c.x, c.y, c.w, c.h);
+			}
+		#end
+	}
+
+	function _reset() {
+		for (c in colliders) {
+			c.destroy();
+		}
+		for(v in visuals) {
+			v.destroy();
+		}
+
+		colliders = [];
+		visuals = [];
+	}
+
 	function _loadBrushes() {
 		var json = Luxe.loadJSON("assets/files/brushes.json");
 		_artChunks = cast json.json.brushes;
 	}
 
 	public function saveJSON(path: String) {
+		trace('attempting save');
+		var json = Json.stringify(_makeJSON(), '\t');
+
 		#if desktop
-			trace('attempting save');
 			var fout = File.write(path, false);
-			var json = _makeJSON();
-			fout.writeString(Json.stringify(json));
+			fout.writeString(json);
 			fout.close();
-		#else
-			trace('save only available on desktop');
+		#end
+		#if js
+			untyped __js__('window.prompt(\"Copy to clipboard: Ctrl+C, Enter\", json)');
 		#end
 	}
 
