@@ -41,7 +41,7 @@ class Player extends Sprite {
 			var dist: Vector = Vector.Subtract(pos, Luxe.camera.pos);
 
 			Luxe.camera.pos.x += (dist.x - Luxe.screen.w / 2) * dt * _camSpeedMult;
-			Luxe.camera.pos.y += (dist.y - Luxe.screen.h / 2) * dt * _camSpeedMult;
+			Luxe.camera.pos.y += (dist.y - Luxe.screen.h / 2) * dt * _camSpeedMult * 2.5;
 		}
 		else {
 			if(Luxe.mouse.x < 10) Luxe.camera.pos.x -= dt * _camSpeed;

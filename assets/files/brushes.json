@@ -1,6 +1,7 @@
 {
 	"brushes": [
 		{"art": "assets/art/stamp.png", "w": "214", "h": "252"},
-		{"art": "assets/art/mockup.png", "w": "960", "h": "640"}
+		{"art": "assets/art/mockup.png", "w": "960", "h": "640"},
+		{"art": "assets/art/thing@2x.png", "w": "82", "h": "106"}
 	]
 }
