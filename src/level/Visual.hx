@@ -12,6 +12,8 @@ class Visual extends Sprite {
 
 	var _pressed: Bool = false;
 
+	public var kill = false;
+
 	public var art: String;
 
 	public function new(x_: Float, y_: Float, w_: Float, h_: Float, art: String) {
@@ -57,6 +59,9 @@ class Visual extends Sprite {
 			else if(Luxe.input.keypressed(Key.comma)) {
 				depth--;
 			}
+			else if(Luxe.input.keypressed(Key.key_x)) {
+				kill = true;
+			}
 		}
 		if(Luxe.input.mousereleased(1)) {
 			_pressed = false;
@@ -73,5 +78,11 @@ class Visual extends Sprite {
 
 	public function disableDebug() {
 		_geom.visible = false;
+	}
+
+	override function destroy(?_) {
+		_geom.visible = false;
+		_geom.drop();
+		super.destroy();
 	}
 }

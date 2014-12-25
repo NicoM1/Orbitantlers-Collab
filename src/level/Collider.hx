@@ -155,4 +155,10 @@ class Collider extends Polygon {
 	public function toggleDebug() {
 		_geom.visible = !_geom.visible;
 	}
+
+	override function destroy() {
+		_geom.visible = false;
+		_geom.drop();
+		super.destroy();
+	}
 }

@@ -95,7 +95,17 @@ class Level {
 					}
 				}
 			}
-			for (c in colliders) c.update();
+
+			for (c in colliders) {
+				if(c.selected && Luxe.input.keypressed(Key.key_x)) {
+					colliders.remove(c);
+					_selectedCount--;
+					c.destroy();
+					continue;
+				}
+				c.update();
+			}
+			//for (c in colliders) c.update();
 		}
 		if(_visualMode) {
 			if(Luxe.input.keypressed(Key.key_v)) {
@@ -140,7 +150,14 @@ class Level {
 				).enableDebug();
 			}
 
-			for(v in visuals) v.updateDebug();
+			for(v in visuals) {
+				if(v.kill) {
+					visuals.remove(v);
+					v.destroy();
+					continue;
+				}
+				v.updateDebug();
+			}
 		}
 	}
 
