@@ -47,6 +47,10 @@ class Level {
 		_brush.visible = false;
 
 		parseJSON('assets/files/output.lvl');
+
+		#if android
+		toggleEdit();
+		#end
 	}
 
 	public function update() {

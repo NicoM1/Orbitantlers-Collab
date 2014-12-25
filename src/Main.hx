@@ -32,9 +32,13 @@ class Main extends luxe.Game {
 
     function _setUpCamera() {
     	Luxe.camera.size = new Vector(Luxe.screen.w, Luxe.screen.h);
-		var zoom = (Luxe.screen.h / _defaultY) * 2;
+		var zoom = (Luxe.screen.h / _defaultY);
 		trace(zoom);
-		Luxe.camera.zoom = 1;//zoom;
+		//#if android 
+			Luxe.camera.zoom = zoom;
+		//#else 
+			//Luxe.camera.zoom = 1; 
+		//#end
     }
 
     function _load() {

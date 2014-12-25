@@ -94,12 +94,15 @@ class MovementComponent extends Component {
 	//ID of the touch used for left/right movement
 	var _touchMoveID: Null<Int> = null;
 
+	var _touchJumpID: Null<Int> = null;
+
 	//is currently using touch to move left
 	var _touchMoveLeft: Bool = false;
 	//is currently using touch to move left
 	var _touchMoveRight: Bool = false;
 	//has tapped jump portion in last frame
 	var _touchJump: Bool = false;
+	var _touchJumpReleased: Bool = false;
 
 	//has pressed [jump] button on controller
 	var _gamepadJump: Bool = false;
@@ -146,8 +149,11 @@ class MovementComponent extends Component {
 		}
 		//if this is a new touch, regardless of if we have an ID,
 		//check if it is on the jump portion
-		if(e.x > _touchJumpStart) {
-			_touchJump = true;
+		if(_touchJumpID == null) {
+			if(e.x > _touchJumpStart) {
+				_touchJump = true;
+				_touchJumpID = e.touch_id;
+			}
 		}
 	}
 
@@ -164,6 +170,10 @@ class MovementComponent extends Component {
 			_touchMoveLeft = false;
 			_touchMoveRight = false;
 			_touchMoveID = null;
+		}
+		if(e.touch_id == _touchJumpID) {
+			_touchJumpReleased = true;
+			_touchJumpID = null;
 		}
 	}
 
@@ -224,7 +234,7 @@ class MovementComponent extends Component {
 		var iLeft: Bool = Luxe.input.keydown(Keycodes.key_a) || _touchMoveLeft || _gamepadLeft;
 		var iRight: Bool = Luxe.input.keydown(Keycodes.key_d) || _touchMoveRight || _gamepadRight;
 		var iJump: Bool = Luxe.input.keypressed(Keycodes.space) || _touchJump || _gamepadJump;
-		var iJumpReleased: Bool = Luxe.input.keyreleased(Keycodes.space) || _gamepadJumpRelease;
+		var iJumpReleased: Bool = Luxe.input.keyreleased(Keycodes.space) || _gamepadJumpRelease || _touchJumpReleased;
 
 		//test left/right collision (touching walls)
 		var cLeft: Bool = _checkCollision(-1, 0);
@@ -370,6 +380,7 @@ class MovementComponent extends Component {
 		_touchJump = false;
 		_gamepadJump = false;
 		_gamepadJumpRelease = false;
+		_touchJumpReleased = false;
 	}
 
 	///Collide against scene and integrate velocity
