@@ -51,10 +51,10 @@ class Visual extends Sprite {
 		}
 		if(_pressed) {
 			pos.subtract(dist);
-			if(Luxe.input.keypressed(Key.equals)) {
+			if(Luxe.input.keypressed(Key.period)) {
 				depth++;
 			}
-			else if(Luxe.input.keypressed(Key.minus)) {
+			else if(Luxe.input.keypressed(Key.comma)) {
 				depth--;
 			}
 		}

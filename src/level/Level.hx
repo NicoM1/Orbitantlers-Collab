@@ -28,16 +28,15 @@ class Level {
 
 	var _brush: Sprite;
 
-	var _artChunks: Array<VisualStruct> = [
-		{art: "assets/art/stamp.png", w: 214, h: 252},
-		{art: "assets/art/mockup.png", w: 960, h: 640}
-	];
+	var _artChunks: Array<VisualStruct>;
 
 	var _selectedArt: Int = 0;
 
 	public function new() {
 		colliders = new Array<Collider>();
 		visuals = new Array<Visual>();
+
+		_loadBrushes();
 
 		_brush = new Sprite({
 			texture: Luxe.loadTexture(_artChunks[_selectedArt].art),
@@ -161,6 +160,11 @@ class Level {
 		for(c in map.colliders) {
 			_addColider(c.x, c.y, c.w, c.h);
 		}
+	}
+
+	function _loadBrushes() {
+		var json = Luxe.loadJSON("assets/files/brushes.json");
+		_artChunks = cast json.json.brushes;
 	}
 
 	public function saveJSON(path: String) {
