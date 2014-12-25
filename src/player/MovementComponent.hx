@@ -107,13 +107,6 @@ class MovementComponent extends Component {
 	var _gamepadLeft: Bool = false;
 	//is holding movement axis to the right
 	var _gamepadRight: Bool = false;
-
-	//left edge of viewport
-	var _leftEdge: Float;
-	//right edge of viewport
-	var _rightEdge: Float;
-	//bottom edge of viewport
-	var _floorEdge: Float;
 	
 	public function new() {
 		super({name: 'movement'});
@@ -126,15 +119,7 @@ class MovementComponent extends Component {
 
 		_collisionShape = Polygon.rectangle(pos.x, pos.y, colWidth, colHeight);
 
-		_findScreenEdges();
-
 		pos.x = Luxe.screen.w / 2 - colWidth / 2;
-	}
-
-	function _findScreenEdges() {
-		_leftEdge = Std.int(Luxe.camera.screen_point_to_world(new Vector()).x);
-		_rightEdge = Std.int(Luxe.camera.screen_point_to_world(new Vector(Luxe.screen.w)).x);
-		_floorEdge = Std.int(Luxe.camera.screen_point_to_world(new Vector(0, Luxe.screen.h)).y);
 	}
 
 	override function update(dt: Float) {
@@ -143,8 +128,6 @@ class MovementComponent extends Component {
 
 		_doMovement(dt);
 		_doCollision(dt);
-
-		_collideScreen();
 	}
 
 	override function ontouchdown(e: TouchEvent) {
@@ -443,23 +426,6 @@ class MovementComponent extends Component {
 		pos.y = _collisionShape.y;
 	}
 
-	///Collide against screen edges
-	function _collideScreen() {	
-		if(pos.y + colHeight / 2 > _floorEdge) {
-			vY = 0;
-			pos.y = _floorEdge - colHeight / 2;
-		}
-
-		if(pos.x + colWidth / 2 > _rightEdge) {
-			vX = 0;
-			pos.x = _rightEdge - colWidth / 2;
-		}
-		else if(pos.x - colWidth / 2 < _leftEdge) {
-			vX = 0;
-			pos.x = _leftEdge + colWidth / 2;
-		}
-	}
-
 	///Returns +1/0/-1 for sign of float
 	function _sign(v: Float): Int {
 		if(v == 0) return 0;
@@ -468,18 +434,11 @@ class MovementComponent extends Component {
 
 	///Check if touching at base
 	function _onGround(): Bool {
-		if(pos.y + _sprite.size.y / 2 >= _floorEdge) {
-			return true;
-		}
-
 		return _checkCollision(0, 1);
 	}
 
 	///Check collision after an offset
 	function _checkCollision(offsetX: Int, offsetY: Int): Bool {
-		if(pos.x + offsetX - colWidth / 2 < _leftEdge) {return true;}
-		if(pos.x + offsetX + colWidth / 2 > _rightEdge) {return true;}
-
 		_collisionShape.x = pos.x + offsetX;
 		_collisionShape.y = pos.y + offsetY;
 
