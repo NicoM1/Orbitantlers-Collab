@@ -103,6 +103,7 @@ class MovementComponent extends Component {
 
 	//has pressed [jump] button on controller
 	var _gamepadJump: Bool = false;
+	var _gamepadJumpRelease: Bool = false;
 	//is holding movement axis to the left
 	var _gamepadLeft: Bool = false;
 	//is holding movement axis to the right
@@ -184,6 +185,13 @@ class MovementComponent extends Component {
 		}
 	}
 
+	override function ongamepadup(e: GamepadEvent) {
+		//if we pressed [jump] on the controller
+		if(e.button == XBoxButtonMap.GAMEPAD_A) {
+			_gamepadJumpRelease = true;
+		}
+	}
+
 	override function ongamepadaxis(e: GamepadEvent) {
 		//check gamepad axis for movement, taking into account deadzones
 		if(e.axis == 0) {
@@ -214,7 +222,7 @@ class MovementComponent extends Component {
 		var iLeft: Bool = Luxe.input.keydown(Keycodes.key_a) || _touchMoveLeft || _gamepadLeft;
 		var iRight: Bool = Luxe.input.keydown(Keycodes.key_d) || _touchMoveRight || _gamepadRight;
 		var iJump: Bool = Luxe.input.keypressed(Keycodes.space) || _touchJump || _gamepadJump;
-		var iJumpReleased: Bool = Luxe.input.keyreleased(Keycodes.space); //|| _touchJump || _gamepadJump;
+		var iJumpReleased: Bool = Luxe.input.keyreleased(Keycodes.space) || _gamepadJumpRelease;
 
 		//test left/right collision (touching walls)
 		var cLeft: Bool = _checkCollision(-1, 0);
@@ -359,6 +367,7 @@ class MovementComponent extends Component {
 
 		_touchJump = false;
 		_gamepadJump = false;
+		_gamepadJumpRelease = false;
 	}
 
 	///Collide against scene and integrate velocity
