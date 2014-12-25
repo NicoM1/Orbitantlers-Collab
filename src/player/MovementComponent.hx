@@ -131,6 +131,7 @@ class MovementComponent extends Component {
 		_doCollision(dt);
 	}
 
+	#if mobile
 	override function ontouchdown(e: TouchEvent) {
 		//if we dont already have a movement touch id
 		if(_touchMoveID == null) {
@@ -150,18 +151,6 @@ class MovementComponent extends Component {
 		}
 	}
 
-	function _checkTouchMove(e: TouchEvent) {
-		//if touch is less than ratio, touch is considered left movement
-		if(e.x <= _touchMoveRatio / 2) {
-			_touchMoveLeft = true;
-			_touchMoveRight = false;
-		}
-		else {
-			_touchMoveLeft = false;
-			_touchMoveRight = true;
-		}
-	}
-
 	override function ontouchmove(e: TouchEvent) {
 		//if the touch we are tracking moves, check if the move direction has changed
 		if(e.touch_id == _touchMoveID) {
@@ -177,6 +166,19 @@ class MovementComponent extends Component {
 			_touchMoveID = null;
 		}
 	}
+
+	function _checkTouchMove(e: TouchEvent) {
+		//if touch is less than ratio, touch is considered left movement
+		if(e.x <= _touchMoveRatio / 2) {
+			_touchMoveLeft = true;
+			_touchMoveRight = false;
+		}
+		else {
+			_touchMoveLeft = false;
+			_touchMoveRight = true;
+		}
+	}
+	#end
 
 	override function ongamepaddown(e: GamepadEvent) {
 		//if we pressed [jump] on the controller
