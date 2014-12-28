@@ -231,8 +231,8 @@ class MovementComponent extends Component {
 		var tempFric: Float;
 
 		//check input keys
-		var iLeft: Bool = Luxe.input.keydown(Keycodes.key_a) || _touchMoveLeft || _gamepadLeft;
-		var iRight: Bool = Luxe.input.keydown(Keycodes.key_d) || _touchMoveRight || _gamepadRight;
+		var iLeft: Bool = Luxe.input.keydown(Keycodes.key_a) || Luxe.input.keydown(Keycodes.left) || _touchMoveLeft || _gamepadLeft;
+		var iRight: Bool = Luxe.input.keydown(Keycodes.key_d) || Luxe.input.keydown(Keycodes.right) || _touchMoveRight || _gamepadRight;
 		var iJump: Bool = Luxe.input.keypressed(Keycodes.space) || _touchJump || _gamepadJump;
 		var iJumpReleased: Bool = Luxe.input.keyreleased(Keycodes.space) || _gamepadJumpRelease || _touchJumpReleased;
 
