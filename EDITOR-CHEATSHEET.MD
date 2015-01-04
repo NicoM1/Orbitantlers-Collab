@@ -16,6 +16,7 @@
 #VISUAL-MODE
 **(every action must be done while holding down a white circle.)**
 (other than changing modes or brushes.)
+
 | ACTION/KEY          | RESULT              |
 |:--------------------|---------------------|
 | `Tab`               | Enter: **GAME-MODE**|
