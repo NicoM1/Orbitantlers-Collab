@@ -23,7 +23,7 @@
 | `v`                 | Enter: **EDIT-MODE**|
 | Drag Circle         | Move Visual         |
 | `, (<)`             | Decrease Depth      |
-| `. (<)`             | Increase Depth      |
+| `. (>)`             | Increase Depth      |
 | `UP`                | Cycle Brush         |
 | `DOWN`              | Cycle Brush         |
 | `x`                 | Delete Pressed Vis. |
