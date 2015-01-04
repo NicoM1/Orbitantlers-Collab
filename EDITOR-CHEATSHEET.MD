@@ -5,7 +5,7 @@
 #EDIT-MODE
 | ACTION/KEY          | RESULT                |
 |:--------------------|-----------------------|
-| `Tab`               | Enter: **GAME-MODE**  |
+| `e`                 | Enter: **GAME-MODE**  |
 | `v`                 | Enter: **VISUAL-MODE**|
 | `LMB`               | Select Collider       |
 | Drag Selected Col.  | Move Collider         |
