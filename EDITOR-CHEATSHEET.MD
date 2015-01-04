@@ -1,7 +1,7 @@
 #GAME-MODE
 | ACTION/KEY          | RESULT              |
 |:--------------------|---------------------|
-| `Tab`               | Enter: **EDIT-MODE**|
+| `e`                 | Enter: **EDIT-MODE**|
 #EDIT-MODE
 | ACTION/KEY          | RESULT                |
 |:--------------------|-----------------------|
@@ -19,7 +19,7 @@
 
 | ACTION/KEY          | RESULT              |
 |:--------------------|---------------------|
-| `Tab`               | Enter: **GAME-MODE**|
+| `e`                 | Enter: **GAME-MODE**|
 | `v`                 | Enter: **EDIT-MODE**|
 | Drag Circle         | Move Visual         |
 | `, (<)`             | Decrease Depth      |
