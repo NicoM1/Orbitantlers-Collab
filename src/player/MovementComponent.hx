@@ -74,7 +74,7 @@ class MovementComponent extends Component {
 	var _jumpMarginTimer: Float = 0;
 
 	///Gravity without friction
-	var _gravNorm: Float = 25;//45;
+	var _gravNorm: Float = 20;//25;//45;
 	///Gravity against an object
 	var _gravSlide: Float = 4; //JUMP + GRAVITY
 
