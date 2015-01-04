@@ -67,6 +67,8 @@ class Visual extends Sprite {
 		}
 		if(_pressed) {
 			pos.subtract(dist);
+			pos.x = Math.floor(pos.x);
+			pos.y = Math.floor(pos.y);
 			if(Luxe.input.keypressed(Key.period)) {
 				depth++;
 			}
