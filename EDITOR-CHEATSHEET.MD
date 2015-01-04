@@ -36,9 +36,13 @@
 
 ##DESKTOP:
 `s` to save to: `bin/target/assets/files/output.lvl`
+
 **back this up, files overwrite and are not numbered currently!**
+
 Loading is only done at startup, where the output.lvl file is used (will get overwritten on rebuild I believe, copy levels to working directory!!!!!!!)
 
-##WEV:
+##WEB:
+
 `s` to save (prompts to copy)
+
 `l` to load (prompts to paste)
