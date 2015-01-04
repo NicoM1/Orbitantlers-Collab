@@ -16,17 +16,31 @@ class Visual extends Sprite {
 
 	public var art: String;
 
-	public function new(x_: Float, y_: Float, w_: Float, h_: Float, art: String) {
-		this.art = art;
+	var _rotateSpeed: Float = 20;
 
-		var texture = Luxe.loadTexture(art);
+	public function new(x_: Float, 
+						y_: Float, 
+						w_: Float, 
+						h_: Float, 
+						art_: String, 
+						depth_: Float, 
+						flipx_: Bool, 
+						flipy_: Bool, 
+						rotation_: Float) {
+		art = art_;
+
+		var texture = Luxe.loadTexture(art_);
 		texture.filter = FilterType.nearest;
 		super ({
 			texture: texture,
 			pos: new Vector(x_ + w_/2, y_ + h_/2),
 			size: new Vector(w_, h_),
-			depth: -1
+			depth: depth_
 		});
+
+		flipx = flipx_;
+		flipy = flipy_;
+		rotation_z = rotation_;
 
 		_geom = new CircleGeometry({
 			r: 10,
@@ -61,6 +75,18 @@ class Visual extends Sprite {
 			}
 			else if(Luxe.input.keypressed(Key.key_x)) {
 				kill = true;
+			}
+			else if(Luxe.input.keypressed(Key.leftbracket)) {
+				flipx = !flipx;
+			}
+			else if(Luxe.input.keypressed(Key.rightbracket)) {
+				flipy = !flipy;
+			}
+			else if(Luxe.input.keydown(Key.key_o)) {
+				rotation_z -= Luxe.dt * _rotateSpeed;
+			}
+			else if(Luxe.input.keydown(Key.key_p)) {
+				rotation_z += Luxe.dt * _rotateSpeed;
 			}
 		}
 		if(Luxe.input.mousereleased(1)) {
