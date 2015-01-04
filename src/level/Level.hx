@@ -154,7 +154,11 @@ class Level {
 					Math.floor(brushPos.y), 
 					_artChunks[_selectedArt].w, 
 					_artChunks[_selectedArt].h,
-					_artChunks[_selectedArt].art
+					_artChunks[_selectedArt].art,
+					-1,
+					false,
+					false,
+					0
 				).enableDebug();
 			}
 
@@ -180,7 +184,7 @@ class Level {
 		var map: MapStruct = cast json;
 
 		for(v in map.visuals) {
-			_addVisual(v.x, v.y, v.w, v.h, v.art);
+			_addVisual(v.x, v.y, v.w, v.h, v.art, v.depth, v.flipx, v.flipy, v.rotation);
 		}
 		for(c in map.colliders) {
 			_addColider(c.x, c.y, c.w, c.h);
@@ -196,7 +200,7 @@ class Level {
 			var map: MapStruct = cast json;
 
 			for(v in map.visuals) {
-				_addVisual(v.x, v.y, v.w, v.h, v.art);
+				_addVisual(v.x, v.y, v.w, v.h, v.art, v.depth, v.flipx, v.flipy, v.rotation);
 			}
 			for(c in map.colliders) {
 				_addColider(c.x, c.y, c.w, c.h);
@@ -258,7 +262,10 @@ class Level {
 				w: v.size.x,
 				h: v.size.y,
 				depth: v.depth,
-				art: v.art
+				art: v.art,
+				flipx: v.flipx,
+				flipy: v.flipy,
+				rotation: v.rotation_z
 			};
 			json.visuals.push(vJSON);
 		}
@@ -271,8 +278,16 @@ class Level {
 		colliders.push(collider);
 	}
 
-	function _addVisual(x: Float, y: Float, w: Float, h: Float, art: String): Visual {
-		var visual = new Visual(x,y,w,h,art);
+	function _addVisual(x: Float, 
+						y: Float, 
+						w: Float, 
+						h: Float, 
+						art: String, 
+						depth: Float, 
+						flipx: Bool, 
+						flipy: Bool, 
+						rotation: Float): Visual {
+		var visual = new Visual(x,y,w,h,art,depth,flipx,flipy,rotation);
 		visuals.push(visual);
 		return visual;
 	}
@@ -309,7 +324,10 @@ typedef VisualStruct = {
 	w: Float,
 	h: Float,
 	art: String,
-	?depth: Float
+	?depth: Float,
+	?flipx: Bool,
+	?flipy: Bool,
+	?rotation: Float
 }
 
 typedef ColliderStruct = {
