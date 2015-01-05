@@ -25,6 +25,7 @@ class Level {
 	var _visualMode: Bool = false;
 
 	public static var _selectedCount: Int = 0;
+	public static var _selectedVisualCount: Int = 0;
 
 	var _brush: Sprite;
 
@@ -170,6 +171,7 @@ class Level {
 				}
 				v.updateDebug();
 			}
+			_selectedVisualCount = 0;
 		}
 	}
 

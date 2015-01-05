@@ -65,7 +65,8 @@ class Visual extends Sprite {
 				_pressed = true;
 			}
 		}
-		if(_pressed) {
+		if(_pressed && Level._selectedVisualCount == 0) {
+			Level._selectedVisualCount = 1;
 			pos.subtract(dist);
 			pos.x = Math.floor(pos.x);
 			pos.y = Math.floor(pos.y);
