@@ -111,6 +111,8 @@ class MovementComponent extends Component {
 	var _gamepadLeft: Bool = false;
 	//is holding movement axis to the right
 	var _gamepadRight: Bool = false;
+
+	var _camera: CameraComponent;
 	
 	public function new() {
 		super({name: 'movement'});
@@ -124,6 +126,8 @@ class MovementComponent extends Component {
 		_collisionShape = Polygon.rectangle(pos.x, pos.y, colWidth, colHeight);
 
 		pos.x = Luxe.screen.w / 2 - colWidth / 2;
+
+		_camera = get('camera');
 	}
 
 	override function update(dt: Float) {
@@ -223,6 +227,8 @@ class MovementComponent extends Component {
 	}
 
 	function _doMovement(dt: Float) {
+
+		_camera.lookPoint = pos.clone();
 		//check if on a surface
 		var onGround: Bool = _onGround();
 
@@ -330,6 +336,8 @@ class MovementComponent extends Component {
 				if(onGround && _anim.animation != 'run') {
 					_anim.animation = 'run';
 				}
+
+				_camera.lookPoint.x += vX * 60;
 			}
 		}
 
@@ -373,6 +381,8 @@ class MovementComponent extends Component {
 			//FALL/////////////////////////////////////////////////////////////
 			_anim.animation = 'fall';
 		}
+
+		_camera.lookPoint.y += vY * 10;
 
 		//count down jump margin timer
 		_jumpMarginTimer -= dt;
@@ -441,6 +451,17 @@ class MovementComponent extends Component {
 		var finalCols = Collision.testShapes(_collisionShape, cast Level.colliders);
 		if(finalCols.length > 0) {
 			for(fc in finalCols) {
+				if(fc.separation.length > 0) {
+					trace('separating');
+					if(fc.separation.x < fc.separation.y) {
+						trace('x');
+						fc.separation.x += _sign(fc.separation.x);
+					}
+					else {
+						trace('y');
+						fc.separation.y += _sign(fc.separation.y);
+					}
+				}
 				_collisionShape.position.add(fc.separation);
 			}
 		}
