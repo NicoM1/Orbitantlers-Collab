@@ -382,7 +382,7 @@ class MovementComponent extends Component {
 			_anim.animation = 'fall';
 		}
 
-		_camera.lookPoint.y += vY * 10;
+		//_camera.lookPoint.y += vY * 10;
 
 		//count down jump margin timer
 		_jumpMarginTimer -= dt;

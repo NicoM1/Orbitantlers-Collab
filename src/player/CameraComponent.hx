@@ -39,4 +39,4 @@ class CameraComponent extends Component {
 		}
 	}
 
-}
+} 	
