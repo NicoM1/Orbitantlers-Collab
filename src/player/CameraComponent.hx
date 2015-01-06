@@ -21,6 +21,11 @@ class CameraComponent extends Component {
 		super({name: 'camera'});
 	}
 
+	override function init() {
+		lookPoint = entity.pos;
+		pos = entity.pos;
+	}
+
 	override function update(dt: Float) {
 		if(Luxe.input.keypressed(Key.key_c)) {
 			_lockCamera = !_lockCamera;
