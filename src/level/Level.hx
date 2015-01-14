@@ -17,15 +17,24 @@ import sys.io.File;
 #end
 
 class Level {
+	public static var instance(get, null): Level;
+	static function get_instance(): Level {
+		if(_instance == null) {
+			_instance = new Level();
+		}
+		return _instance;
+	}
+	static var _instance: Level;
 
-	static public var colliders(default, null): Array<Collider>;
+	public var colliders(default, null): Array<Collider>;
 	var visuals: Array<Visual>;
+	var _portals: Array<Collider>;
 
 	var _editMode: Bool = true;
 	var _visualMode: Bool = false;
 
-	public static var _selectedCount: Int = 0;
-	public static var _selectedVisualCount: Int = 0;
+	public var _selectedCount: Int = 0;
+	public var _selectedVisualCount: Int = 0;
 
 	var _brush: Sprite;
 
@@ -36,6 +45,7 @@ class Level {
 	public function new() {
 		colliders = new Array<Collider>();
 		visuals = new Array<Visual>();
+		_portals = new Array<Collider>();
 
 		_loadBrushes();
 
@@ -47,7 +57,7 @@ class Level {
 		_brush.color.a = 0.5;
 		_brush.visible = false;
 
-		parseJSON('assets/files/output.lvl');
+		//parseJSON('startarea');
 
 		#if android
 		toggleEdit();
@@ -55,6 +65,10 @@ class Level {
 	}
 
 	public function update() {
+		if(Luxe.input.keypressed(Key.key_r)) _reset();
+		for(p in _portals) {
+			p.checkPortal();
+		}
 		if(_editMode) {
 			if(Luxe.input.keypressed(Key.key_v)) {
 				toggleEdit();
@@ -69,7 +83,12 @@ class Level {
 			var safe: Bool = false;
 			if(Luxe.input.mousepressed(3)) {
 				var pos = Luxe.camera.screen_point_to_world(Luxe.mouse);
-				_addColider(pos.x, pos.y, 32, 32);
+				if(!Luxe.input.keydown(Key.key_p)) {
+					_addColider(pos.x, pos.y, 32, 32);
+				}
+				else{
+					_addColider(pos.x, pos.y, 32, 32, 'test');
+				}
 			}
 			if(Luxe.input.keydown(Key.key_q) || _selectedCount == 0) {
 				if(Luxe.input.mousepressed(1)) {
@@ -182,6 +201,7 @@ class Level {
 	}
 
 	public function parseJSON(path: String) {
+		path = 'assets/files/levels/${path}.lvl'; 
 		var json = Luxe.loadJSON(path).json;
 		var map: MapStruct = cast json;
 
@@ -191,6 +211,11 @@ class Level {
 		for(c in map.colliders) {
 			_addColider(c.x, c.y, c.w, c.h);
 		}
+	}
+
+	public function loadLevel(id: String) {
+		_reset();
+		parseJSON(id);
 	}
 
 	function _loadJSONWeb() {
@@ -217,9 +242,13 @@ class Level {
 		for(v in visuals) {
 			v.destroy();
 		}
+		for (p in _portals) {
+			p.destroy();
+		}
 
 		colliders = [];
 		visuals = [];
+		_portals = [];
 	}
 
 	function _loadBrushes() {
@@ -275,9 +304,15 @@ class Level {
 		return json;
 	}
 
-	function _addColider(x: Float, y: Float, w: Float, h: Float) {
+	function _addColider(x: Float, y: Float, w: Float, h: Float, ?portalTarget: String = '') {
 		var collider = new Collider(x, y, w, h);
-		colliders.push(collider);
+		if(portalTarget == '') {
+			colliders.push(collider);
+		}
+		else {
+			collider.portalTarget = portalTarget;
+			_portals.push(collider);
+		}
 	}
 
 	function _addVisual(x: Float, 

@@ -11,6 +11,8 @@ import luxe.collision.Collision;
 
 import luxe.collision.ShapeDrawerLuxe;
 
+import player.MovementComponent;
+
 class Collider extends Polygon {
 
 	var _geom: RectangleGeometry;
@@ -24,6 +26,9 @@ class Collider extends Polygon {
 	public var h(default, null): Float;
 
 	var _test: ShapeDrawerLuxe;
+
+	public var portalTarget: String = '';
+	var _player: Polygon = null;
 
 	public function new(x_: Float, y_: Float, w_: Float, h_: Float) {
 		var rect = Polygon.rectangle(x_, y_, w_, h_, false);
@@ -44,9 +49,10 @@ class Collider extends Polygon {
 			batcher: Luxe.renderer.batcher
 		});
 
-		//Luxe.renderer.batcher.add(_geom);
 		_geom.depth = 10;
 		//toggleDebug();
+
+		_player = cast (Luxe.scene.entities.get('player').get('movement'), MovementComponent).getCollision();
 	}
 
 	public function select() {
@@ -101,6 +107,13 @@ class Collider extends Polygon {
 		_makeChanges();
 	}
 
+	public function checkPortal() {
+		_geom.color.r = 0;
+		if(Collision.test(this, _player) != null) {
+			Level.instance.loadLevel(portalTarget);
+		}
+	}
+
 	function _makeChanges() {
 		if(selected) _moving = false;
 		if(_moving || _resizing || selected) {
@@ -111,11 +124,11 @@ class Collider extends Polygon {
 		 		var delta = _lastMouse.subtract(Luxe.camera.screen_point_to_world(Luxe.mouse));
 		 		var mousePos = Vector.Subtract(Luxe.camera.screen_point_to_world(Luxe.mouse), position);
 
-		 		if(!_resizing && ((mousePos.x < w - 10 || mousePos.y < h - 10) || Level._selectedCount > 1)) {//|| selected
+		 		if(!_resizing && ((mousePos.x < w - 10 || mousePos.y < h - 10) || Level.instance._selectedCount > 1)) {//|| selected
 		 			_moving = true;
 		 			changePos(-delta.x, -delta.y);
 		 		}
-		 		else if (!_moving && Level._selectedCount == 1) { // && !selected
+		 		else if (!_moving && Level.instance._selectedCount == 1) { // && !selected
 		 			_resizing = true;
 		 			changeSize(-delta.x, -delta.y);
 		 		}
@@ -145,10 +158,7 @@ class Collider extends Polygon {
 
 	public function mouseInside(): Bool {
 		var is = Collision.pointInPoly(Luxe.camera.screen_point_to_world(Luxe.mouse), this);
-			//Luxe.mouse.x > x &&
-			//Luxe.mouse.x < x + w &&
-			//Luxe.mouse.y > y &&
-			//Luxe.mouse.y < y + h;
+
 		return is;
 	}
 

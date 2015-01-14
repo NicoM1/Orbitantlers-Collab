@@ -130,6 +130,10 @@ class MovementComponent extends Component {
 		_camera = get('camera');
 	}
 
+	public function getCollision(): Polygon {
+		return _collisionShape;
+	}
+
 	override function update(dt: Float) {
 		//cap dt
 		if(dt > 1/10) dt = 1/10;
@@ -415,7 +419,7 @@ class MovementComponent extends Component {
 			_collisionShape.y += _sign(vYNew);
 
 			//test new position against scene
-			var c = Collision.testShapes(_collisionShape, cast Level.colliders);
+			var c = Collision.testShapes(_collisionShape, cast Level.instance.colliders);
 			if(c.length > 0) {
 				vY = 0;
 				break;
@@ -435,7 +439,7 @@ class MovementComponent extends Component {
 			_collisionShape.x += _sign(vXNew);
 
 			//test new position against scene
-			var c = Collision.testShapes(_collisionShape, cast Level.colliders);
+			var c = Collision.testShapes(_collisionShape, cast Level.instance.colliders);
 			if(c.length > 0) {
 				vX = 0;
 				break;
@@ -448,7 +452,7 @@ class MovementComponent extends Component {
 
 		_collisionShape.x = pos.x;
 		_collisionShape.y = pos.y;
-		var finalCols = Collision.testShapes(_collisionShape, cast Level.colliders);
+		var finalCols = Collision.testShapes(_collisionShape, cast Level.instance.colliders);
 		if(finalCols.length > 0) {
 			for(fc in finalCols) {
 				if(fc.separation.length > 0) {
@@ -485,7 +489,7 @@ class MovementComponent extends Component {
 		_collisionShape.x = pos.x + offsetX;
 		_collisionShape.y = pos.y + offsetY;
 
-		return Collision.testShapes(_collisionShape, cast Level.colliders).length > 0;
+		return Collision.testShapes(_collisionShape, cast Level.instance.colliders).length > 0;
 	}
 
 	///Approach a value by a shift amount, affected by dt
