@@ -20,15 +20,15 @@ class Level {
 	public static var instance(get, null): Level;
 	static function get_instance(): Level {
 		if(_instance == null) {
-			_instance = new Level();
+			new Level();
 		}
 		return _instance;
 	}
 	static var _instance: Level;
 
-	public var colliders(default, null): Array<Collider>;
-	var visuals: Array<Visual>;
-	var _portals: Array<Collider>;
+	public var colliders(default, null): Array<EditableObject>;
+	var _visuals: Array<Visual>;
+	var _portals: Array<Portal>;
 
 	var _editMode: Bool = true;
 	var _visualMode: Bool = false;
@@ -42,10 +42,14 @@ class Level {
 
 	var _selectedArt: Int = 0;
 
+	var _wasReset: Bool = false;
+
 	public function new() {
-		colliders = new Array<Collider>();
-		visuals = new Array<Visual>();
-		_portals = new Array<Collider>();
+		_instance = this;
+
+		colliders = new Array<EditableObject>();
+		_visuals = new Array<Visual>();
+		_portals = new Array<Portal>();
 
 		_loadBrushes();
 
@@ -57,18 +61,21 @@ class Level {
 		_brush.color.a = 0.5;
 		_brush.visible = false;
 
-		//parseJSON('startarea');
+		parseJSON('testarea');
 
 		#if android
 		toggleEdit();
 		#end
 	}
 
+	public function loadLevel(id: String) {
+		_reset();
+		parseJSON(id);
+	}
+
 	public function update() {
 		if(Luxe.input.keypressed(Key.key_r)) _reset();
-		for(p in _portals) {
-			p.checkPortal();
-		}
+	
 		if(_editMode) {
 			if(Luxe.input.keypressed(Key.key_v)) {
 				toggleEdit();
@@ -86,8 +93,8 @@ class Level {
 				if(!Luxe.input.keydown(Key.key_p)) {
 					_addColider(pos.x, pos.y, 32, 32);
 				}
-				else{
-					_addColider(pos.x, pos.y, 32, 32, 'test');
+				else {
+					_addPortal(pos.x, pos.y, 32, 32, 'test2');
 				}
 			}
 			if(Luxe.input.keydown(Key.key_q) || _selectedCount == 0) {
@@ -104,12 +111,29 @@ class Level {
 							}
 						}
 					}
+					for (p in _portals) {
+						if (p.mouseInside()) {
+							p.toggleSelected();
+							safe = true;
+							if(p.selected) {
+								_selectedCount++;
+							}
+							else {
+								_selectedCount--;
+							}
+						}
+					}
 				}
 			}
 			if(Luxe.input.mousepressed(1) && !safe) {
 				var deselect: Bool = true;
 				for(c in colliders) {
 					if(c.selected && c.mouseInside()) {
+						deselect = false;
+					}
+				}
+				for(p in _portals) {
+					if(p.selected && p.mouseInside()) {
 						deselect = false;
 					}
 				}
@@ -121,6 +145,12 @@ class Level {
 						}
 						c.deselect();
 					}
+					for (p in _portals) {
+						if(p.selected) {
+							_selectedCount--;
+						}
+						p.deselect();
+					}
 				}
 			}
 
@@ -131,9 +161,17 @@ class Level {
 					c.destroy();
 					continue;
 				}
-				c.update();
+				c.editModeUpdate();
 			}
-			//for (c in colliders) c.update();
+			for (p in _portals) {
+				if(p.selected && Luxe.input.keypressed(Key.key_x)) {
+					_portals.remove(p);
+					_selectedCount--;
+					p.destroy();
+					continue;
+				}
+				p.editModeUpdate();
+			}
 		}
 		if(_visualMode) {
 			if(Luxe.input.keypressed(Key.key_v)) {
@@ -182,15 +220,20 @@ class Level {
 				).enableDebug();
 			}
 
-			for(v in visuals) {
+			for(v in _visuals) {
 				if(v.kill) {
-					visuals.remove(v);
+					_visuals.remove(v);
 					v.destroy();
 					continue;
 				}
 				v.updateDebug();
 			}
 			_selectedVisualCount = 0;
+		}
+		_wasReset = false;
+		for(p in _portals) {
+			p.update();
+			if(_wasReset) break;
 		}
 	}
 
@@ -213,11 +256,6 @@ class Level {
 		}
 	}
 
-	public function loadLevel(id: String) {
-		_reset();
-		parseJSON(id);
-	}
-
 	function _loadJSONWeb() {
 		#if web
 			_reset();
@@ -226,7 +264,7 @@ class Level {
 			trace('json', json);
 			var map: MapStruct = cast json;
 
-			for(v in map.visuals) {
+			for(v in map._visuals) {
 				_addVisual(v.x, v.y, v.w, v.h, v.art, v.depth, v.flipx, v.flipy, v.rotation);
 			}
 			for(c in map.colliders) {
@@ -239,16 +277,18 @@ class Level {
 		for (c in colliders) {
 			c.destroy();
 		}
-		for(v in visuals) {
+		for(v in _visuals) {
 			v.destroy();
 		}
-		for (p in _portals) {
+		for(p in _portals) {
 			p.destroy();
 		}
 
 		colliders = [];
-		visuals = [];
+		_visuals = [];
 		_portals = [];
+
+		_wasReset = true;
 	}
 
 	function _loadBrushes() {
@@ -286,7 +326,7 @@ class Level {
 			json.colliders.push(cJSON);
 		}
 
-		for(v in visuals) {
+		for(v in _visuals) {
 			var vJSON: VisualStruct = {
 				x: v.pos.x - v.size.x / 2, 
 				y: v.pos.y - v.size.y / 2, 
@@ -304,15 +344,14 @@ class Level {
 		return json;
 	}
 
-	function _addColider(x: Float, y: Float, w: Float, h: Float, ?portalTarget: String = '') {
-		var collider = new Collider(x, y, w, h);
-		if(portalTarget == '') {
-			colliders.push(collider);
-		}
-		else {
-			collider.portalTarget = portalTarget;
-			_portals.push(collider);
-		}
+	function _addColider(x: Float, y: Float, w: Float, h: Float) {
+		var collider = new EditableObject(x, y, w, h);
+		colliders.push(collider);
+	}
+
+	function _addPortal(x: Float, y: Float, w: Float, h: Float, target: String) {
+		var portal = new Portal(x, y, w, h, target);
+		_portals.push(portal);
 	}
 
 	function _addVisual(x: Float, 
@@ -325,7 +364,7 @@ class Level {
 						flipy: Bool, 
 						rotation: Float): Visual {
 		var visual = new Visual(x,y,w,h,art,depth,flipx,flipy,rotation);
-		visuals.push(visual);
+		_visuals.push(visual);
 		return visual;
 	}
 
@@ -338,13 +377,13 @@ class Level {
 	}
 
 	function _disableVisualMode() {
-		for(v in visuals) v.disableDebug();
+		for(v in _visuals) v.disableDebug();
 		_brush.visible = false;
 		_visualMode = false;
 	}
 
 	function _enableVisualMode() {
-		for(v in visuals) v.enableDebug();
+		for(v in _visuals) v.enableDebug();
 		_brush.visible = true;
 		_visualMode = true;
 	}

@@ -11,9 +11,9 @@ import luxe.collision.Collision;
 
 import luxe.collision.ShapeDrawerLuxe;
 
-import player.MovementComponent;
+import phoenix.Color;
 
-class Collider extends Polygon {
+class EditableObject extends Polygon {
 
 	var _geom: RectangleGeometry;
 
@@ -27,8 +27,8 @@ class Collider extends Polygon {
 
 	var _test: ShapeDrawerLuxe;
 
-	public var portalTarget: String = '';
-	var _player: Polygon = null;
+	var _baseColor: Color = new Color(1,1,1,1);
+	var _selectedColor: Color = new Color(1,0,1,1);
 
 	public function new(x_: Float, y_: Float, w_: Float, h_: Float) {
 		var rect = Polygon.rectangle(x_, y_, w_, h_, false);
@@ -50,9 +50,9 @@ class Collider extends Polygon {
 		});
 
 		_geom.depth = 10;
-		//toggleDebug();
+		_geom.color = _baseColor;
 
-		_player = cast (Luxe.scene.entities.get('player').get('movement'), MovementComponent).getCollision();
+		//toggleDebug();
 	}
 
 	public function select() {
@@ -99,7 +99,7 @@ class Collider extends Polygon {
 		_resetVisual();
 	}
 
-	public function update() {
+	public function editModeUpdate() {
 		if(Luxe.input.mousereleased(1)) {
 			_moving = false;
 			_resizing = false;
@@ -107,17 +107,12 @@ class Collider extends Polygon {
 		_makeChanges();
 	}
 
-	public function checkPortal() {
-		_geom.color.r = 0;
-		if(Collision.test(this, _player) != null) {
-			Level.instance.loadLevel(portalTarget);
-		}
-	}
+	public function update() {}
 
 	function _makeChanges() {
 		if(selected) _moving = false;
 		if(_moving || _resizing || selected) {
-			_geom.color.g = 0;
+			_geom.color = _selectedColor;
 
 			if(Luxe.input.mousedown(1)) {
 
@@ -135,7 +130,7 @@ class Collider extends Polygon {
 		 	}
 		}
 		else {
-			_geom.color.g = 1;
+			_geom.color = _baseColor;
 			_moving = false;
 			_resizing = false;
 		}

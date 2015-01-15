@@ -14,8 +14,6 @@ class Main extends luxe.Game {
 	var _defaultX: Int = 960;
 	var _defaultY: Int = 640;
 
-	var _level: Level;
-
 	override function config(c: AppConfig): AppConfig {
 		//c.window.width = 1440;
 		//c.window.width = 768;
@@ -59,15 +57,14 @@ class Main extends luxe.Game {
     function _assetsLoaded(_) {
     	trace('loaded');
     	new player.Player();
-    	_level = new Level();
     }
 
     override function onkeyup( e:KeyEvent ) {
     	if(e.keycode == Key.key_e) {
-    		_level.toggleEdit();
+    		Level.instance.toggleEdit();
     	}
     	if(e.keycode == Key.key_s) {
-    		_level.saveJSON('assets/files/output.lvl');
+    		Level.instance.saveJSON('assets/files/output.lvl');
     	}
         if(e.keycode == Key.escape) {
             Luxe.shutdown();
@@ -76,8 +73,7 @@ class Main extends luxe.Game {
     } //onkeyup
 
     override function update(dt:Float) {
-    	if(_level != null)
-    		_level.update();
+    		Level.instance.update();
     } //update
 
     override function ondestroy() {

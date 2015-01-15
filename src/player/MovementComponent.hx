@@ -128,6 +128,7 @@ class MovementComponent extends Component {
 		pos.x = Luxe.screen.w / 2 - colWidth / 2;
 
 		_camera = get('camera');
+		_camera.lookPoint = _sprite.pos;
 	}
 
 	public function getCollision(): Polygon {
