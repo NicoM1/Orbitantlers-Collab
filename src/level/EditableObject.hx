@@ -11,7 +11,9 @@ import luxe.collision.Collision;
 
 import luxe.collision.ShapeDrawerLuxe;
 
-class Collider extends Polygon {
+import phoenix.Color;
+
+class EditableObject extends Polygon {
 
 	var _geom: RectangleGeometry;
 
@@ -24,6 +26,9 @@ class Collider extends Polygon {
 	public var h(default, null): Float;
 
 	var _test: ShapeDrawerLuxe;
+
+	var _baseColor: Color = new Color(1,1,1,1);
+	var _selectedColor: Color = new Color(1,0,1,1);
 
 	public function new(x_: Float, y_: Float, w_: Float, h_: Float) {
 		var rect = Polygon.rectangle(x_, y_, w_, h_, false);
@@ -44,8 +49,9 @@ class Collider extends Polygon {
 			batcher: Luxe.renderer.batcher
 		});
 
-		//Luxe.renderer.batcher.add(_geom);
 		_geom.depth = 10;
+		_geom.color = _baseColor;
+
 		//toggleDebug();
 	}
 
@@ -93,7 +99,7 @@ class Collider extends Polygon {
 		_resetVisual();
 	}
 
-	public function update() {
+	public function editModeUpdate() {
 		if(Luxe.input.mousereleased(1)) {
 			_moving = false;
 			_resizing = false;
@@ -101,28 +107,32 @@ class Collider extends Polygon {
 		_makeChanges();
 	}
 
+	public function update() {
+		
+	}
+
 	function _makeChanges() {
 		if(selected) _moving = false;
 		if(_moving || _resizing || selected) {
-			_geom.color.g = 0;
+			_geom.color = _selectedColor;
 
 			if(Luxe.input.mousedown(1)) {
 
 		 		var delta = _lastMouse.subtract(Luxe.camera.screen_point_to_world(Luxe.mouse));
 		 		var mousePos = Vector.Subtract(Luxe.camera.screen_point_to_world(Luxe.mouse), position);
 
-		 		if(!_resizing && ((mousePos.x < w - 10 || mousePos.y < h - 10) || Level._selectedCount > 1)) {//|| selected
+		 		if(!_resizing && ((mousePos.x < w - 10 || mousePos.y < h - 10) || Level.instance._selectedCount > 1)) {//|| selected
 		 			_moving = true;
 		 			changePos(-delta.x, -delta.y);
 		 		}
-		 		else if (!_moving && Level._selectedCount == 1) { // && !selected
+		 		else if (!_moving && Level.instance._selectedCount == 1) { // && !selected
 		 			_resizing = true;
 		 			changeSize(-delta.x, -delta.y);
 		 		}
 		 	}
 		}
 		else {
-			_geom.color.g = 1;
+			_geom.color = _baseColor;
 			_moving = false;
 			_resizing = false;
 		}
