@@ -115,18 +115,7 @@ class EditableObject extends Polygon {
 			_geom.color = _selectedColor;
 
 			if(Luxe.input.mousedown(1)) {
-
-		 		var delta = _lastMouse.subtract(Luxe.camera.screen_point_to_world(Luxe.mouse));
-		 		var mousePos = Vector.Subtract(Luxe.camera.screen_point_to_world(Luxe.mouse), position);
-
-		 		if(!_resizing && ((mousePos.x < w - 10 || mousePos.y < h - 10) || Level.instance._selectedCount > 1)) {//|| selected
-		 			_moving = true;
-		 			changePos(-delta.x, -delta.y);
-		 		}
-		 		else if (!_moving && Level.instance._selectedCount == 1) { // && !selected
-		 			_resizing = true;
-		 			changeSize(-delta.x, -delta.y);
-		 		}
+				_pressed();
 		 	}
 		}
 		else {
@@ -135,6 +124,20 @@ class EditableObject extends Polygon {
 			_resizing = false;
 		}
 		_lastMouse.copy_from(Luxe.camera.screen_point_to_world(Luxe.mouse));
+	}
+
+	function _pressed() {
+		var delta = _lastMouse.subtract(Luxe.camera.screen_point_to_world(Luxe.mouse));
+		var mousePos = Vector.Subtract(Luxe.camera.screen_point_to_world(Luxe.mouse), position);
+
+		if(!_resizing && ((mousePos.x < w - 10 || mousePos.y < h - 10) || Level.instance._selectedCount > 1)) {//|| selected
+			_moving = true;
+			changePos(-delta.x, -delta.y);
+		}
+		else if (!_moving && Level.instance._selectedCount == 1) { // && !selected
+			_resizing = true;
+			changeSize(-delta.x, -delta.y);
+		}
 	}
 
 	function _resetVisual() {

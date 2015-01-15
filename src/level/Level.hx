@@ -39,10 +39,14 @@ class Level {
 	var _brush: Sprite;
 
 	var _artChunks: Array<VisualStruct>;
+	var _portalTargets: Array<String>;
+	var _currentTarget: Int = -1;
 
 	var _selectedArt: Int = 0;
 
 	var _wasReset: Bool = false;
+
+	var _debugPortalText: String = '';
 
 	public function new() {
 		_instance = this;
@@ -52,6 +56,7 @@ class Level {
 		_portals = new Array<Portal>();
 
 		_loadBrushes();
+		_loadLevels();
 
 		_brush = new Sprite({
 			texture: Luxe.loadTexture(_artChunks[_selectedArt].art),
@@ -68,15 +73,39 @@ class Level {
 		#end
 	}
 
+	function _loadLevels() {
+		_portalTargets = new Array<String>();
+		var json = Luxe.loadJSON("assets/files/levels/levels.json");
+		for(i in cast (json.json.levels, Array<Dynamic>)) {
+			_portalTargets.push(i.id);
+		}
+	}
+
 	public function loadLevel(id: String) {
 		_reset();
 		parseJSON(id);
+	}
+
+	public function nextTarget(): String {
+		_currentTarget++;
+		if(_currentTarget >= _portalTargets.length) _currentTarget = 0;
+		return _portalTargets[_currentTarget];
+	}
+
+	public function setDebugText(text: String) {
+		_debugPortalText = text;
 	}
 
 	public function update() {
 		if(Luxe.input.keypressed(Key.key_r)) _reset();
 	
 		if(_editMode) {
+			Luxe.draw.text({
+				text: _debugPortalText,
+				immediate: true,
+				pos: Luxe.camera.screen_point_to_world(new Vector(5,5))
+			});
+
 			if(Luxe.input.keypressed(Key.key_v)) {
 				toggleEdit();
 				_enableVisualMode();
@@ -287,6 +316,9 @@ class Level {
 		colliders = [];
 		_visuals = [];
 		_portals = [];
+
+		_selectedCount = 0;
+		_selectedVisualCount = 0;
 
 		_wasReset = true;
 	}

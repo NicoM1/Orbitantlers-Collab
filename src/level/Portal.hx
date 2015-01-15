@@ -15,6 +15,8 @@ import phoenix.Color;
 
 import player.MovementComponent;
 
+import luxe.Input;
+
 class Portal extends EditableObject {
 
 	public var _portalTarget: String = '';
@@ -30,6 +32,18 @@ class Portal extends EditableObject {
 
 	override function update() {
 		_checkPortal();
+	}
+
+	override function editModeUpdate() {
+		super.editModeUpdate();
+	}
+
+	override function _pressed() {
+		super._pressed();
+		if(Luxe.input.keypressed(Key.key_p)) {
+			_portalTarget = Level.instance.nextTarget();
+			Level.instance.setDebugText(_portalTarget);
+		}
 	}
 
 	function _checkPortal() {
