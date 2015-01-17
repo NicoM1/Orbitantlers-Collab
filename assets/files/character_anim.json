@@ -37,9 +37,9 @@
 	},
 	"attack-overhead": {
 		"frame_size": {"x": "47", "y": "70"},
-		"frameset": ["15-20"],
+		"frameset": ["15-17", "hold 1", "18-20"],
 		"loop": "true",
-		"speed": "17",
+		"speed": "21",
 		"events":  {"frame": "6", "event": "attack_complete"}
 	}
 }

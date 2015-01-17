@@ -262,9 +262,9 @@ class MovementComponent extends Component {
 		//check input keys
 		var iLeft: Bool = Luxe.input.keydown(Keycodes.key_a) || Luxe.input.keydown(Keycodes.left) || _touchMoveLeft || _gamepadLeft;
 		var iRight: Bool = Luxe.input.keydown(Keycodes.key_d) || Luxe.input.keydown(Keycodes.right) || _touchMoveRight || _gamepadRight;
-		var iJump: Bool = Luxe.input.keypressed(Keycodes.space) || Luxe.input.keypressed(Keycodes.key_z) || _touchJump || _gamepadJump;
+		var iJump: Bool = Luxe.input.keypressed(Keycodes.space) || Luxe.input.keypressed(Keycodes.key_z) || Luxe.input.keypressed(Keycodes.key_j) || _touchJump || _gamepadJump;
 		var iJumpReleased: Bool = Luxe.input.keyreleased(Keycodes.space) || Luxe.input.keyreleased(Keycodes.key_z) || _gamepadJumpRelease || _touchJumpReleased;
-		var iAttack: Bool = Luxe.input.keypressed(Keycodes.key_x); //|| _gamepadJumpRelease || _touchJumpReleased;
+		var iAttack: Bool = Luxe.input.keypressed(Keycodes.key_x) || Luxe.input.keypressed(Keycodes.key_k); //|| _gamepadJumpRelease || _touchJumpReleased;
 
 		//test left/right collision (touching walls)
 		var cLeft: Bool = _checkCollision(-1, 0);

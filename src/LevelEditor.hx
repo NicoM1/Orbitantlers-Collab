@@ -1,5 +1,0 @@
-package level;
-
-class LevelEditor {
-	
-}
