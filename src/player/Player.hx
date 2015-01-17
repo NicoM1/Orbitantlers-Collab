@@ -12,13 +12,13 @@ import luxe.Input;
 class Player extends Sprite {
 
 	public function new() {
-		var texture = Luxe.loadTexture('assets/art/character/run_strip.png');
+		var texture = Luxe.loadTexture('assets/art/character/anim_strip.png');
 		texture.filter = FilterType.nearest;
 
 		super({
 			name: 'player',
 			texture: texture,
-			size: new Vector(37, 40)
+			size: new Vector(47, 70)
 		});
 
 		_createAnim();

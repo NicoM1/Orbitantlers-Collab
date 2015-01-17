@@ -21,6 +21,8 @@ import input.XBoxButtonMap;
 
 import level.*;
 
+import phoenix.Color;
+
 class MovementComponent extends Component {
 
 	//owner of this component
@@ -36,6 +38,8 @@ class MovementComponent extends Component {
 	var colWidth: Int = 13;
 	//height of collider
 	var colHeight: Int = 40;
+	var colHeightOffset: Float;
+	var colWidthOffset: Float;
 	///Internal collider representation
 	var _collisionShape: Polygon;
 	var _drawer: ShapeDrawerLuxe; //COLLISION
@@ -85,6 +89,9 @@ class MovementComponent extends Component {
 	///Currently sticking to wall
 	var _sticking: Bool = false; //WALL-CLING
 
+	var _attacking: Bool = false;
+	var _attackDelay: Float = 0.05;
+
 	//percentage of screen before which pressing counts as left input
 	//after counts as right input
 	var _touchMoveRatio: Float = 0.3;
@@ -119,16 +126,22 @@ class MovementComponent extends Component {
 	}
 
 	override function init() {
+		_drawer = new ShapeDrawerLuxe();
+
 		_sprite = cast entity;
 		_machine = new States({name:'machine'});
 		_anim = get('anim');
 
-		_collisionShape = Polygon.rectangle(pos.x, pos.y, colWidth, colHeight);
+		colHeightOffset = _sprite.size.y/2 - colHeight;
+		colWidthOffset = -colWidth/2;
+		_collisionShape = Polygon.rectangle(pos.x + colWidthOffset, pos.y + colHeightOffset, colWidth, colHeight, false); //use this in other positions
 
 		pos.x = Luxe.screen.w / 2 - colWidth / 2;
 
 		_camera = get('camera');
 		_camera.lookPoint = _sprite.pos;
+
+		_sprite.events.listen('attack_complete', _attackComplete);
 	}
 
 	public function getCollision(): Polygon {
@@ -140,6 +153,11 @@ class MovementComponent extends Component {
 		if(dt > 1/10) dt = 1/10;
 
 		_doMovement(dt);
+		if(_attacking) {
+			if(_checkFinished('attack-overhead', 6)) {
+				_attackComplete({});
+			}
+		}
 		_doCollision(dt);
 	}
 
@@ -244,8 +262,9 @@ class MovementComponent extends Component {
 		//check input keys
 		var iLeft: Bool = Luxe.input.keydown(Keycodes.key_a) || Luxe.input.keydown(Keycodes.left) || _touchMoveLeft || _gamepadLeft;
 		var iRight: Bool = Luxe.input.keydown(Keycodes.key_d) || Luxe.input.keydown(Keycodes.right) || _touchMoveRight || _gamepadRight;
-		var iJump: Bool = Luxe.input.keypressed(Keycodes.space) || _touchJump || _gamepadJump;
-		var iJumpReleased: Bool = Luxe.input.keyreleased(Keycodes.space) || _gamepadJumpRelease || _touchJumpReleased;
+		var iJump: Bool = Luxe.input.keypressed(Keycodes.space) || Luxe.input.keypressed(Keycodes.key_z) || _touchJump || _gamepadJump;
+		var iJumpReleased: Bool = Luxe.input.keyreleased(Keycodes.space) || Luxe.input.keyreleased(Keycodes.key_z) || _gamepadJumpRelease || _touchJumpReleased;
+		var iAttack: Bool = Luxe.input.keypressed(Keycodes.key_x); //|| _gamepadJumpRelease || _touchJumpReleased;
 
 		//test left/right collision (touching walls)
 		var cLeft: Bool = _checkCollision(-1, 0);
@@ -293,7 +312,7 @@ class MovementComponent extends Component {
 		}
 		if(!onGround && (cLeft || cRight)) {
 			if(_anim.animation != 'wallslide') {
-				_anim.animation = 'wallslide';
+				_setAnim('wallslide');
 			}
 		}
 
@@ -309,6 +328,10 @@ class MovementComponent extends Component {
 				vX = _approachValue(vX, -_vMax.x, tempAccel);
 				doFric = false;
 				_sprite.flipx = true;
+
+				if(iAttack && Math.abs(vX) > _vMax.x / 2) {
+					_attackOverhead(0);
+				}
 			}
 
 			if(iRight && !iLeft) {
@@ -320,6 +343,10 @@ class MovementComponent extends Component {
 				vX = _approachValue(vX, _vMax.x, tempAccel);
 				doFric = false;
 				_sprite.flipx = false;
+
+				if(iAttack && Math.abs(vX) > _vMax.x / 2) {
+					_attackOverhead(0);
+				}
 			}
 
 			//if no input pressed, apply friction to slow down
@@ -328,18 +355,18 @@ class MovementComponent extends Component {
 				if(onGround) {
 					//FLOOR-SLIDE////////////////////////////////////////////////////////
 					if(vX != 0) {
-						_anim.animation = 'slide';
+						_setAnim('slide');
 					}
 					//IDLE//////////////////////////////////////////////////////////////
 					else if (_anim.animation != 'idle') {
-						_anim.animation = 'idle';
+						_setAnim('idle');
 					}
 				}
 			}
 			else {	//we must be moving so play run
 				//RUN//////////////////////////////////////////////////////////////
 				if(onGround && _anim.animation != 'run') {
-					_anim.animation = 'run';
+					_setAnim('run');
 				}
 
 				_camera.lookPoint.x += vX * 60;
@@ -362,7 +389,7 @@ class MovementComponent extends Component {
 
 			if(didJump) {
 				//WALL-JUMP/////////////////////////////////////////////////////////////
-				_anim.animation = 'jump';
+				_setAnim('jump');
 			}
 		}
 
@@ -372,7 +399,7 @@ class MovementComponent extends Component {
 				vY = -_jumpHeight;
 				_jumpMarginTimer = 0;
 				//JUMP////////////////////////////////////////////////////////////////
-				_anim.animation = 'jump';
+				_setAnim('jump');
 			}
 		}
 
@@ -384,7 +411,7 @@ class MovementComponent extends Component {
 
 		if(!onGround && !cLeft && ! cRight && vY > 0) {
 			//FALL/////////////////////////////////////////////////////////////
-			_anim.animation = 'fall';
+			_setAnim('fall');
 		}
 
 		//_camera.lookPoint.y += vY * 10;
@@ -396,6 +423,32 @@ class MovementComponent extends Component {
 		_gamepadJump = false;
 		_gamepadJumpRelease = false;
 		_touchJumpReleased = false;
+	}
+
+	function _setAnim(anim: String) {
+		if(_attacking) return;
+		_anim.frame = 0;
+		_anim.animation = anim;
+	}
+
+	function _attackOverhead(direction: Int) {
+		if(_attacking) return;
+
+		_setAnim('attack-overhead');
+		vY = -_jumpHeight * 0.5;
+		_attacking = true;
+	}
+
+	function _checkFinished(anim: String, frame: Int): Bool {
+		if(_anim.animation == anim) {
+			if(_anim.frame == frame) return true;
+		}
+		return false;
+	}
+
+	function _attackComplete(_) {
+		_attacking = false;
+		_setAnim('run');
 	}
 
 	///Collide against scene and integrate velocity
@@ -411,8 +464,8 @@ class MovementComponent extends Component {
 		_cY -= vYNew;
 
 		//match collision shape to object position
-		_collisionShape.x = pos.x;
-		_collisionShape.y = pos.y;
+		_collisionShape.x = pos.x + colWidthOffset;
+		_collisionShape.y = pos.y + colHeightOffset;
 
 		//iterate over y-velocity
 		for(i in 0...Std.int(Math.abs(vYNew)) + 1) {
@@ -432,7 +485,7 @@ class MovementComponent extends Component {
 		}
 
 		//match collision shape to final y-position
-		_collisionShape.y = pos.y;
+		_collisionShape.y = pos.y + colHeightOffset;
 
 		//iterate over x-velocity
 		for(i in 0...Std.int(Math.abs(vXNew)) + 1) {
@@ -451,8 +504,8 @@ class MovementComponent extends Component {
 			}
 		}
 
-		_collisionShape.x = pos.x;
-		_collisionShape.y = pos.y;
+		_collisionShape.x = pos.x + colWidthOffset;
+		_collisionShape.y = pos.y + colHeightOffset;
 		var finalCols = Collision.testShapes(_collisionShape, cast Level.instance.colliders);
 		if(finalCols.length > 0) {
 			for(fc in finalCols) {
@@ -470,8 +523,8 @@ class MovementComponent extends Component {
 				_collisionShape.position.add(fc.separation);
 			}
 		}
-		pos.x = _collisionShape.x;
-		pos.y = _collisionShape.y;
+		pos.x = _collisionShape.x - colWidthOffset;
+		pos.y = _collisionShape.y - colHeightOffset;
 	}
 
 	///Returns +1/0/-1 for sign of float
@@ -487,8 +540,8 @@ class MovementComponent extends Component {
 
 	///Check collision after an offset
 	function _checkCollision(offsetX: Int, offsetY: Int): Bool {
-		_collisionShape.x = pos.x + offsetX;
-		_collisionShape.y = pos.y + offsetY;
+		_collisionShape.x = pos.x + colWidthOffset + offsetX;
+		_collisionShape.y = pos.y + colHeightOffset + offsetY;
 
 		return Collision.testShapes(_collisionShape, cast Level.instance.colliders).length > 0;
 	}
