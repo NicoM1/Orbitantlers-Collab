@@ -23,6 +23,8 @@ import level.*;
 
 import phoenix.Color;
 
+import luxe.Entity;
+
 class MovementComponent extends Component {
 
 	//owner of this component
@@ -120,6 +122,8 @@ class MovementComponent extends Component {
 	var _gamepadRight: Bool = false;
 
 	var _camera: CameraComponent;
+
+	var _enemies: Array<Entity>;
 	
 	public function new() {
 		super({name: 'movement'});
@@ -142,6 +146,9 @@ class MovementComponent extends Component {
 		_camera.lookPoint = _sprite.pos;
 
 		_sprite.events.listen('attack_complete', _attackComplete);
+
+		_enemies = [];
+		Luxe.scene.get_named_like('enemy', _enemies);
 	}
 
 	public function getCollision(): Polygon {
@@ -437,6 +444,10 @@ class MovementComponent extends Component {
 		_setAnim('attack-overhead');
 		vY = -_jumpHeight * 0.5;
 		_attacking = true;
+
+		for(e in _enemies) {
+			e.events.fire('get_hit', {});
+		}
 	}
 
 	function _checkFinished(anim: String, frame: Int): Bool {

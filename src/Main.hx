@@ -7,6 +7,8 @@ import phoenix.Color;
 import level.Level;
 import luxe.Parcel;
 import luxe.ParcelProgress;
+import luxe.Sprite;
+import luxe.tween.Actuate;
 
 //47.26 STRIPPED
 class Main extends luxe.Game {
@@ -57,6 +59,8 @@ class Main extends luxe.Game {
     function _assetsLoaded(_) {
     	trace('loaded');
     	new player.Player();
+
+        var s = new enemies.Enemy();
     }
 
     override function onkeyup( e:KeyEvent ) {
@@ -73,7 +77,11 @@ class Main extends luxe.Game {
     } //onkeyup
 
     override function update(dt:Float) {
-    		Level.instance.update();
+    	Level.instance.update();
+
+        if(Luxe.input.mousepressed(1)) {
+            trace(Luxe.camera.screen_point_to_world(Luxe.mouse));
+        }
     } //update
 
     override function ondestroy() {
